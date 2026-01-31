@@ -118,9 +118,9 @@ using (var scope = app.Services.CreateScope())
     catch (SqlException ex)
     {
         // Esto aparecerá en los logs de Cloud Run
-        Console.WriteLine("❌ ERROR DE SQL: " + ex.Message);
-        Console.WriteLine("CÓDIGO DE ERROR: " + ex.Number);
-        Console.WriteLine("STACKTRACE: " + ex.StackTrace);
+        Console.WriteLine("❌ ERROR DE SQL 2: " + ex.Message);
+        Console.WriteLine("CÓDIGO DE ERROR 2: " + ex.Number);
+        Console.WriteLine("STACKTRACE 2: " + ex.StackTrace);
     }
     catch (Exception ex)
     {
