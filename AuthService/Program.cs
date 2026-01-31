@@ -13,7 +13,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = "Server=127.0.0.1,1433;Database=DW_Portfolio;User Id=sqlserver;Password=MxN1990A;Encrypt=True;TrustServerCertificate=True;";
+var connectionString = "Server=127.0.0.1,1433;Database=DW_Portfolio;User Id=sqlserver;Password=MxN1990A;TrustServerCertificate=True;Connect Timeout=30;";
 Console.WriteLine($"Connection String: {connectionString}");
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? "DefaultKey";
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "DefaultIssuer";
