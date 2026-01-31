@@ -1,234 +1,57 @@
 steps:
 
   # Paso 1: Linting (warnings como errores)
-
   - name: 'mcr.microsoft.com/dotnet/sdk:8.0'
-
     entrypoint: dotnet
-
     args: ['build', 'AuthService/AuthService.csproj']
 
-
-
   # Paso 2: Pruebas unitarias
-
   - name: 'mcr.microsoft.com/dotnet/sdk:8.0'
-
     entrypoint: dotnet
-
     args: ['test', 'AuthService.Test/AuthService.Test.csproj', '--logger:trx']
 
-
-
   # Paso 3: Análisis de vulnerabilidades con Trivy
-
   - name: 'aquasec/trivy:latest'
-
     args: ['fs', '--exit-code', '1', '--severity', 'HIGH,CRITICAL', '.']
 
-
-
   # Paso 4: Build de la imagen con Dockerfile
-
   - name: 'gcr.io/cloud-builders/docker'
-
     args: [
-
       'build',
-
       '-t', 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA',
-
       '.'
-
     ]
-
-
 
   # Paso 5: Push de la imagen a Artifact Registry
-
   - name: 'gcr.io/cloud-builders/docker'
-
     args: [
-
       'push',
-
       'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
-
     ]
 
-    # Paso 6: Deploy a Cloud Run
-  - name: 'gcr.io/://google.com'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'authservice' # Nombre de tu servicio en Cloud Run
-      - '--image'
-      - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
-      - '--region'
-      - 'us-central1'
-      - '--platform'
-      - 'managed'
-      # 1. Habilita la conexión física a la instancia (Proxy interno)
-      - '--add-cloudsql-instances'
-      - 'api-security-485810:us-central1:sqli01'
-      # 2. Define la identidad que usará Cloud Run para conectarse
-      - '--service-account'
-      - 'mi-service-account@api-security-485810.iam.gserviceaccount.com'
-      # 3. Mapea tus secretos (opcional pero recomendado)
-      - '--set-secrets'
-      - 'CONN=CONN:latest'
-
   # Paso 6: Deploy a Cloud Run con secretos
-
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-
     entrypoint: gcloud
-
     args: [
-
       'run', 'deploy', 'authservice',
-
       '--image', 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA',
-
       '--region', 'us-central1',
-
       '--platform', 'managed',
-
       '--allow-unauthenticated',
-
       '--add-cloudsql-instances', 'api-security-485810:us-central1:sqli01',
-
       '--update-secrets', 'CONN=CONN:latest',
       '--update-secrets', 'CORS_HOST=CORS_HOST:latest',
       '--update-secrets', 'CORS_NAME=CORS_NAME:latest',
       '--update-secrets', 'JWT_AUDIENCE=JWT_AUDIENCE:latest',
       '--update-secrets', 'JWT_ISSUER=JWT_ISSUER:latest',
       '--update-secrets', 'JWT_KEY=JWT_KEY:latest'
-
     ]
 
-
-
 images:
-
   - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
 
-
-
 # Aquí van las opciones globales
-
 serviceAccount: projects/api-security-485810/serviceAccounts/mi-service-account@api-security-485810.iam.gserviceaccount.com
 
 options:
-
   logging: CLOUD_LOGGING_ONLY
-  
-  
-  steps:
-
-  # Paso 1: Linting (warnings como errores)
-
-  - name: 'mcr.microsoft.com/dotnet/sdk:8.0'
-
-    entrypoint: dotnet
-
-    args: ['build', 'AuthService/AuthService.csproj']
-
-
-
-  # Paso 2: Pruebas unitarias
-
-  - name: 'mcr.microsoft.com/dotnet/sdk:8.0'
-
-    entrypoint: dotnet
-
-    args: ['test', 'AuthService.Test/AuthService.Test.csproj', '--logger:trx']
-
-
-
-  # Paso 3: Análisis de vulnerabilidades con Trivy
-
-  - name: 'aquasec/trivy:latest'
-
-    args: ['fs', '--exit-code', '1', '--severity', 'HIGH,CRITICAL', '.']
-
-
-
-  # Paso 4: Build de la imagen con Dockerfile
-
-  - name: 'gcr.io/cloud-builders/docker'
-
-    args: [
-
-      'build',
-
-      '-t', 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA',
-
-      '.'
-
-    ]
-
-
-
-  # Paso 5: Push de la imagen a Artifact Registry
-
-  - name: 'gcr.io/cloud-builders/docker'
-
-    args: [
-
-      'push',
-
-      'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
-
-    ]
-
-
-
-  # Paso 6: Deploy a Cloud Run con secretos
-
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-
-    entrypoint: gcloud
-
-    args: [
-
-      'run', 'deploy', 'authservice',
-
-      '--image', 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA',
-
-      '--region', 'us-central1',
-
-      '--platform', 'managed',
-
-      '--allow-unauthenticated',
-
-      '--add-cloudsql-instances', 'api-security-485810:us-central1:sqli01',
-
-      '--update-secrets', 'CONN=CONN:latest',
-      '--update-secrets', 'CORS_HOST=CORS_HOST:latest',
-      '--update-secrets', 'CORS_NAME=CORS_NAME:latest',
-      '--update-secrets', 'JWT_AUDIENCE=JWT_AUDIENCE:latest',
-      '--update-secrets', 'JWT_ISSUER=JWT_ISSUER:latest',
-      '--update-secrets', 'JWT_KEY=JWT_KEY:latest'
-
-    ]
-
-
-
-images:
-
-  - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
-
-
-
-# Aquí van las opciones globales
-
-serviceAccount: projects/api-security-485810/serviceAccounts/mi-service-account@api-security-485810.iam.gserviceaccount.com
-
-options:
-
-  logging: CLOUD_LOGGING_ONLY
-  
-  
-  
