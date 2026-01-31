@@ -14,13 +14,20 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = "Server=127.0.0.1,1433;Database=DW_Portfolio;User Id=sqlserver;Password=MxN1990A;TrustServerCertificate=True;";
+var connectionString = "Server=127.0.0.1;Database=DW_Portfolio;User Id=sqlserver;Password=MxN1990A;TrustServerCertificate=True;";
 Console.WriteLine($"Connection String: {connectionString}");
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? "DefaultKey";
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "DefaultIssuer";
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "DefaultAudience";
 var corsName = Environment.GetEnvironmentVariable("CORS_NAME") ?? "DefaultCors";
 var corsHost = Environment.GetEnvironmentVariable("CORS_HOST") ?? "*";
+Console.WriteLine($"jwtKey: {jwtKey}");
+Console.WriteLine($"jwtIssuer: {jwtIssuer}");
+Console.WriteLine($"jwtAudience: {jwtAudience}");
+Console.WriteLine($"corsName: {corsName}");
+Console.WriteLine($"corsHost: {corsHost}");
+
+
 
 builder.Services.AddCors(options =>
 {
