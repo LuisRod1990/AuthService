@@ -57,27 +57,27 @@ steps:
     ]
 
     # Paso 6: Deploy a Cloud Run
-    - name: 'gcr.io/://google.com'
-        entrypoint: gcloud
-        args:
-            - 'run'
-            - 'deploy'
-            - 'authservice' # Nombre de tu servicio en Cloud Run
-            - '--image'
-            - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
-            - '--region'
-            - 'us-central1'
-            - '--platform'
-            - 'managed'
-            # 1. Habilita la conexión física a la instancia (Proxy interno)
-            - '--add-cloudsql-instances'
-            - 'api-security-485810:us-central1:sqli01'
-            # 2. Define la identidad que usará Cloud Run para conectarse
-            - '--service-account'
-            - 'mi-service-account@api-security-485810.iam.gserviceaccount.com'
-            # 3. Mapea tus secretos (opcional pero recomendado)
-            - '--set-secrets'
-            - 'CONN=CONN:latest'
+  - name: 'gcr.io/://google.com'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'authservice' # Nombre de tu servicio en Cloud Run
+      - '--image'
+      - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      # 1. Habilita la conexión física a la instancia (Proxy interno)
+      - '--add-cloudsql-instances'
+      - 'api-security-485810:us-central1:sqli01'
+      # 2. Define la identidad que usará Cloud Run para conectarse
+      - '--service-account'
+      - 'mi-service-account@api-security-485810.iam.gserviceaccount.com'
+      # 3. Mapea tus secretos (opcional pero recomendado)
+      - '--set-secrets'
+      - 'CONN=CONN:latest'
 
   # Paso 6: Deploy a Cloud Run con secretos
 
