@@ -6,9 +6,10 @@ using AuthService.Infrastructure.Adapters;
 using AuthService.Infrastructure.Persistence;
 using AuthService.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -102,20 +103,30 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-app.Use(async (context, next) =>
+// --- BLOQUE DE PRUEBA PARA CAPTURAR EL ERROR ---
+using (var scope = app.Services.CreateScope())
 {
+    var services = scope.ServiceProvider;
     try
     {
-        await next();
+        var context = services.GetRequiredService<AuthDbContext>();
+        // Esto intenta abrir la conexión físicamente
+        context.Database.OpenConnection();
+        Console.WriteLine("✅ CONEXIÓN EXITOSA A CLOUD SQL SERVER");
+        context.Database.CloseConnection();
+    }
+    catch (SqlException ex)
+    {
+        // Esto aparecerá en los logs de Cloud Run
+        Console.WriteLine("❌ ERROR DE SQL: " + ex.Message);
+        Console.WriteLine("CÓDIGO DE ERROR: " + ex.Number);
+        Console.WriteLine("STACKTRACE: " + ex.StackTrace);
     }
     catch (Exception ex)
     {
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Error procesando la petición {Path}", context.Request.Path);
-        throw;
+        Console.WriteLine("❌ ERROR GENERAL: " + ex.Message);
     }
-});
+}
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("Cadena de conexión: {conn}", connectionString);
