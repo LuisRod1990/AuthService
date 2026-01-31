@@ -62,7 +62,7 @@ steps:
         args:
             - 'run'
             - 'deploy'
-            - 'auth-service' # Nombre de tu servicio en Cloud Run
+            - 'authservice' # Nombre de tu servicio en Cloud Run
             - '--image'
             - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
             - '--region'
