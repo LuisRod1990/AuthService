@@ -2,7 +2,7 @@ steps:
 
   # Paso 1: Linting (warnings como errores)
 
-  - name: 'mcr.microsoft.com/dotnet/sdk:9.0'
+  - name: 'mcr.microsoft.com/dotnet/sdk:8.0'
 
     entrypoint: dotnet
 
@@ -12,7 +12,7 @@ steps:
 
   # Paso 2: Pruebas unitarias
 
-  - name: 'mcr.microsoft.com/dotnet/sdk:9.0'
+  - name: 'mcr.microsoft.com/dotnet/sdk:8.0'
 
     entrypoint: dotnet
 

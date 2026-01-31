@@ -1,5 +1,5 @@
 ﻿# Etapa 1: Build y pruebas
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copiar csproj y restaurar dependencias
@@ -17,7 +17,7 @@ RUN dotnet test AuthService.Test/AuthService.Test.csproj --logger "trx;LogFileNa
 RUN dotnet publish AuthService/AuthService.csproj -c Release -o /app/publish
 
 # Etapa 2: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
 # Copiar artefactos publicados
