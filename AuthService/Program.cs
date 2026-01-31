@@ -103,6 +103,20 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Error procesando la petición {Path}", context.Request.Path);
+        throw;
+    }
+});
+
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("Cadena de conexión: {conn}", connectionString);
 
