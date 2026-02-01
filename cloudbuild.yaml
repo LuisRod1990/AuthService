@@ -18,7 +18,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
-      '-t', 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA',
+      '-t', 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:latest',
       '.'
     ]
 
@@ -26,7 +26,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'push',
-      'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
+      'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:latest'
     ]
 
   # Paso 6: Deploy a Cloud Run con secretos y service account
@@ -34,22 +34,22 @@ steps:
     entrypoint: gcloud
     args: [
       'run', 'deploy', 'authservice',
-      '--image', 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA',
+      '--image', 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:latest',
       '--region', 'us-central1',
       '--platform', 'managed',
       '--allow-unauthenticated',
       '--add-cloudsql-instances', 'api-security-485810:us-central1:sqli01',
       '--service-account', 'mi-service-account@api-security-485810.iam.gserviceaccount.com',
-      '--update-secrets', 'CONN=CONN:latest',
-      '--update-secrets', 'CORS_HOST=CORS_HOST:latest',
-      '--update-secrets', 'CORS_NAME=CORS_NAME:latest',
-      '--update-secrets', 'JWT_AUDIENCE=JWT_AUDIENCE:latest',
-      '--update-secrets', 'JWT_ISSUER=JWT_ISSUER:latest',
-      '--update-secrets', 'JWT_KEY=JWT_KEY:latest'
+      '--update-secrets=CONN=CONN:latest',
+      '--update-secrets=CORS_HOST=CORS_HOST:latest',
+      '--update-secrets=CORS_NAME=CORS_NAME:latest',
+      '--update-secrets=JWT_AUDIENCE=JWT_AUDIENCE:latest',
+      '--update-secrets=JWT_ISSUER=JWT_ISSUER:latest',
+      '--update-secrets=JWT_KEY=JWT_KEY:latest'
     ]
 
 images:
-  - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:latest'
 
 # Opciones globales
 serviceAccount: mi-service-account@api-security-485810.iam.gserviceaccount.com
