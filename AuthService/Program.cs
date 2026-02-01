@@ -115,35 +115,42 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-// --- BLOQUE DE PRUEBA PARA CAPTURAR EL ERROR ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<AuthDbContext>();
-        // Esto intenta abrir la conexión físicamente
         context.Database.OpenConnection();
-        Console.WriteLine("✅ CONEXIÓN EXITOSA A CLOUD SQL SERVER");
+        Console.WriteLine("✅ Conexión exitosa a Cloud SQL Server");
         context.Database.CloseConnection();
     }
     catch (SqlException ex)
     {
-        Console.WriteLine("❌ SQL ERROR: " + ex.Message);
-        Console.WriteLine("Error Number: " + ex.Number);
-        Console.WriteLine("Error State: " + ex.State);
-        Console.WriteLine("Error Class: " + ex.Class);
-        Console.WriteLine("Server: " + ex.Server);
-        Console.WriteLine("Source: " + ex.Source);
-        Console.WriteLine("Procedure: " + ex.Procedure);
-        Console.WriteLine("LineNumber: " + ex.LineNumber);
-        Console.WriteLine("StackTrace: " + ex.StackTrace);
+        Console.WriteLine("❌ SQL ERROR DETALLADO:");
+        Console.WriteLine($"Message: {ex.Message}");
+        Console.WriteLine($"Error Number: {ex.Number}");
+        Console.WriteLine($"Error State: {ex.State}");
+        Console.WriteLine($"Error Class: {ex.Class}");
+        Console.WriteLine($"Server: {ex.Server}");
+        Console.WriteLine($"Source: {ex.Source}");
+        Console.WriteLine($"Procedure: {ex.Procedure}");
+        Console.WriteLine($"LineNumber: {ex.LineNumber}");
+        Console.WriteLine($"StackTrace: {ex.StackTrace}");
+        Console.WriteLine($"ClientConnectionId: {ex.ClientConnectionId}");
     }
     catch (Exception ex)
     {
-        Console.WriteLine("❌ ERROR GENERAL: " + ex.Message);
+        Console.WriteLine("❌ ERROR GENERAL DETALLADO:");
+        Console.WriteLine($"Message: {ex.Message}");
+        Console.WriteLine($"StackTrace: {ex.StackTrace}");
+        if (ex.InnerException != null)
+        {
+            Console.WriteLine($"InnerException: {ex.InnerException.Message}");
+        }
     }
 }
+
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("Cadena de conexión: {conn}", connectionString);
