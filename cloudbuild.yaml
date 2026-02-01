@@ -38,7 +38,7 @@ steps:
       '--region', 'us-central1',
       '--platform', 'managed',
       '--allow-unauthenticated',
-      '--add-cloudsql-instances', 'api-security-485810:us-central1:apiuser',
+      '--add-cloudsql-instances', 'api-security-485810:us-central1:sqli01',
       '--service-account', 'mi-service-account@api-security-485810.iam.gserviceaccount.com',
       '--update-secrets=CONN=CONN:latest',
       '--update-secrets=CORS_HOST=CORS_HOST:latest',
@@ -51,8 +51,15 @@ steps:
 images:
   - 'us-central1-docker.pkg.dev/api-security-485810/apirepo/authservice:latest'
 
+
 # Opciones globales
 serviceAccount: mi-service-account@api-security-485810.iam.gserviceaccount.com
 
 options:
   logging: CLOUD_LOGGING_ONLY
+  
+  
+  
+  
+  
+  
