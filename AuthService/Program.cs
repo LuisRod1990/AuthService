@@ -6,9 +6,7 @@ using AuthService.Infrastructure.Adapters;
 using AuthService.Infrastructure.Persistence;
 using AuthService.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -98,9 +96,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-//builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IUsuarioSeguridadRepository, UsuarioSeguridadRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
