@@ -57,5 +57,3 @@ serviceAccount: mi-service-account@api-security-485810.iam.gserviceaccount.com
 options:
   logging: CLOUD_LOGGING_ONLY
   
-  
-  
