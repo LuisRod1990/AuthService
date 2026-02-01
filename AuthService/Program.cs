@@ -16,7 +16,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = "Host=127.0.0.1;Port=5432;Database=DW_Portfolio;Username=apiuser;Password=MxN1990*;"//Environment.GetEnvironmentVariable("CONN")
+var connectionString = Environment.GetEnvironmentVariable("CONN")
     ?? "Defaults";
 Console.WriteLine($"Connection String: {connectionString}");
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? "DefaultKey";
