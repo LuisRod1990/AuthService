@@ -14,9 +14,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = Environment.GetEnvironmentVariable("CONNsj")
-    ?? "Server=127.0.0.1,1433;Database=DW_Portfolio;User Id=sqlserver;Password=MxN1990Af;Encrypt=True;TrustServerCertificate=True;";
-
+var connectionString = Environment.GetEnvironmentVariable("CONN")
+    ?? "Defaults";
 
 Console.WriteLine($"Connection String: {connectionString}");
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? "DefaultKey";
