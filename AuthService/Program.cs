@@ -91,7 +91,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseSqlServer("Server=34.60.141.106,1433;Database=DW_Portfolio;User Id=sqlserver;Password=MxN1990A;TrustServerCertificate=True;"));
+    options.UseSqlServer("Server=127.0.0.1,1433;Database=DW_Portfolio;User Id=sqlserver;Password=MxN1990A;Encrypt=True;TrustServerCertificate=True;"));
 
 builder.Services.AddScoped<IUsuarioSeguridadRepository, UsuarioSeguridadRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
