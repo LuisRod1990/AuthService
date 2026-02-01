@@ -28,7 +28,11 @@ Console.WriteLine($"jwtAudience: {jwtAudience}");
 Console.WriteLine($"corsName: {corsName}");
 Console.WriteLine($"corsHost: {corsHost}");
 
-
+// Configuración detallada del DbContext para logging
+builder.Services.AddDbContext<AuthDbContext>(options =>
+    options.UseSqlServer(connectionString)
+           .EnableSensitiveDataLogging()   // muestra la cadena de conexión usada. Eliminar en producción
+           .LogTo(Console.WriteLine, LogLevel.Information)); // log detallado. Eliminar en producción
 
 builder.Services.AddCors(options =>
 {
@@ -125,10 +129,15 @@ using (var scope = app.Services.CreateScope())
     }
     catch (SqlException ex)
     {
-        // Esto aparecerá en los logs de Cloud Run
-        Console.WriteLine("❌ ERROR DE SQL 2: " + ex.Message);
-        Console.WriteLine("CÓDIGO DE ERROR 2: " + ex.Number);
-        Console.WriteLine("STACKTRACE 2: " + ex.StackTrace);
+        Console.WriteLine("❌ SQL ERROR: " + ex.Message);
+        Console.WriteLine("Error Number: " + ex.Number);
+        Console.WriteLine("Error State: " + ex.State);
+        Console.WriteLine("Error Class: " + ex.Class);
+        Console.WriteLine("Server: " + ex.Server);
+        Console.WriteLine("Source: " + ex.Source);
+        Console.WriteLine("Procedure: " + ex.Procedure);
+        Console.WriteLine("LineNumber: " + ex.LineNumber);
+        Console.WriteLine("StackTrace: " + ex.StackTrace);
     }
     catch (Exception ex)
     {
