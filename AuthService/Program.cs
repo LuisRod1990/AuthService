@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = Environment.GetEnvironmentVariable("CONN")
     ?? "Defaults";
-Console.WriteLine($"Connection String: {connectionString}");
+Console.WriteLine($"Connection String: {connectionString}  ---------");
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? "DefaultKey";
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "DefaultIssuer";
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "DefaultAudience";
@@ -37,9 +37,9 @@ Console.WriteLine($"corsHost: {corsHost}");
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(corsName, policy =>
+    options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(corsHost)
+        policy.AllowAnyOrigin()
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
@@ -127,7 +127,8 @@ app.UseSwaggerUI();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors(corsName);
+//app.UseCors(corsName);
+app.UseCors();
 
 
 app.MapControllers();
