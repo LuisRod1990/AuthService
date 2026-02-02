@@ -24,11 +24,11 @@ jobs:
     steps:
       # 1. Checkout del código
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 2. Instalar .NET 8
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
@@ -40,22 +40,29 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --verbosity normal
 
-      # 5. Configurar Docker
-      - name: Setup Docker
-        run: |
-          docker build -t server-auth-api:latest .
+      # 5. Configurar credenciales de AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      # 6. Login a Amazon ECR
+      # 6. Build Docker image
+      - name: Build Docker image
+        run: docker build -t server-auth-api:latest .
+
+      # 7. Login a Amazon ECR
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
-      # 7. Push de la imagen a ECR
+      # 8. Push de la imagen a ECR
       - name: Push Docker image to ECR
         run: |
           docker tag server-auth-api:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest
           docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest
 
-      # 8. Deploy en EC2 usando SSM
+      # 9. Deploy en EC2 usando SSM
       - name: Deploy to EC2
         run: |
           aws ssm send-command \
