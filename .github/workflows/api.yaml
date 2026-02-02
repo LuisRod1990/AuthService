@@ -56,13 +56,19 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      # 8. Push de la imagen a ECR
+      # 8. Crear repositorio en ECR si no existe
+      - name: Ensure ECR repository exists
+        run: |
+          aws ecr describe-repositories --repository-names server-auth-api --region ${{ env.AWS_REGION }} || \
+          aws ecr create-repository --repository-name server-auth-api --region ${{ env.AWS_REGION }}
+
+      # 9. Push de la imagen a ECR
       - name: Push Docker image to ECR
         run: |
           docker tag server-auth-api:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest
           docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest
 
-      # 9. Deploy en EC2 usando SSM
+      # 10. Deploy en EC2 usando SSM
       - name: Deploy to EC2
         run: |
           aws ssm send-command \
