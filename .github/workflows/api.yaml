@@ -77,3 +77,5 @@ jobs:
             --comment "Deploy API" \
             --region ${{ env.AWS_REGION }} \
             --parameters 'commands=["docker pull ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest","docker stop server-auth-api || true","docker rm server-auth-api || true","docker run -d -p 80:80 --name server-auth-api -e CONN=${{ env.CONN }} -e JWT_KEY=${{ env.JWT_KEY }} -e JWT_AUDIENCE=${{ env.JWT_AUDIENCE }} -e JWT_ISSUER=${{ env.JWT_ISSUER }} -e CORS_NAME=${{ env.CORS_NAME }} -e CORS_HOST=${{ env.CORS_HOST }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest"]'
+            
+            
