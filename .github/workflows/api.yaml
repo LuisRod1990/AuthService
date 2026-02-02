@@ -43,7 +43,7 @@ jobs:
       # 5. Configurar Docker
       - name: Setup Docker
         run: |
-          docker build -t myapi:latest .
+          docker build -t server-auth-api:latest .
 
       # 6. Login a Amazon ECR
       - name: Login to Amazon ECR
@@ -52,8 +52,8 @@ jobs:
       # 7. Push de la imagen a ECR
       - name: Push Docker image to ECR
         run: |
-          docker tag myapi:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/myapi:latest
-          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/myapi:latest
+          docker tag server-auth-api:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest
+          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest
 
       # 8. Deploy en EC2 usando SSM
       - name: Deploy to EC2
@@ -63,4 +63,4 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "Deploy API" \
             --region ${{ env.AWS_REGION }} \
-            --parameters 'commands=["docker pull ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/myapi:latest","docker stop myapi || true","docker rm myapi || true","docker run -d -p 80:80 --name myapi -e CONN=${{ env.CONN }} -e JWT_KEY=${{ env.JWT_KEY }} -e JWT_AUDIENCE=${{ env.JWT_AUDIENCE }} -e JWT_ISSUER=${{ env.JWT_ISSUER }} -e CORS_NAME=${{ env.CORS_NAME }} -e CORS_HOST=${{ env.CORS_HOST }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/myapi:latest"]'
+            --parameters 'commands=["docker pull ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest","docker stop server-auth-api || true","docker rm server-auth-api || true","docker run -d -p 80:80 --name server-auth-api -e CONN=${{ env.CONN }} -e JWT_KEY=${{ env.JWT_KEY }} -e JWT_AUDIENCE=${{ env.JWT_AUDIENCE }} -e JWT_ISSUER=${{ env.JWT_ISSUER }} -e CORS_NAME=${{ env.CORS_NAME }} -e CORS_HOST=${{ env.CORS_HOST }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest"]'
