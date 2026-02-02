@@ -130,7 +130,6 @@ app.UseAuthorization();
 //app.UseCors(corsName);
 app.UseCors();
 
-
 app.MapControllers();
 
 app.Run();
