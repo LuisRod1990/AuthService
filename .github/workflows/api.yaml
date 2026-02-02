@@ -36,9 +36,9 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release
 
-      # 4. Ejecutar pruebas
+      # 4. Ejecutar pruebas en Release
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --configuration Release --verbosity normal
 
       # 5. Configurar Docker
       - name: Setup Docker
@@ -64,4 +64,3 @@ jobs:
             --comment "Deploy API" \
             --region ${{ env.AWS_REGION }} \
             --parameters 'commands=["docker pull ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/myapi:latest","docker stop myapi || true","docker rm myapi || true","docker run -d -p 80:80 --name myapi -e CONN=${{ env.CONN }} -e JWT_KEY=${{ env.JWT_KEY }} -e JWT_AUDIENCE=${{ env.JWT_AUDIENCE }} -e JWT_ISSUER=${{ env.JWT_ISSUER }} -e CORS_NAME=${{ env.CORS_NAME }} -e CORS_HOST=${{ env.CORS_HOST }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/myapi:latest"]'
-            
