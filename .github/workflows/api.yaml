@@ -42,8 +42,13 @@ jobs:
           sudo systemctl enable docker
           sudo systemctl start docker
 
-          # Carga la imagen y levanta el contenedor
+          # Da permisos a ec2-user para usar Docker
+          sudo usermod -aG docker ec2-user
+
+          # Aplica el grupo sin reiniciar sesión
+          newgrp docker <<EONG
           docker load < /home/ec2-user/authservice.tar.gz
           docker stop authservice || true
           docker rm authservice || true
           docker run -d --name authservice -p 5000:5000 authservice:latest
+          EONG
