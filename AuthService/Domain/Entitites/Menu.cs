@@ -2,9 +2,9 @@
 {
     public class Menu
     {
-        public int MenuId { get; set; }
-        public string Nombre { get; set; }
-        public string Icono { get; set; }
+        public int menuid { get; set; }
+        public string nombre { get; set; }
+        public string icono { get; set; }
 
         public ICollection<SubMenu> SubMenus { get; set; }
 

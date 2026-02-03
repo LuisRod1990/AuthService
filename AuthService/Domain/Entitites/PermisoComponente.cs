@@ -2,12 +2,12 @@
 {
     public class PermisoComponente
     {
-        public int PermisoId { get; set; }
-        public int RolId { get; set; }
-        public int ComponenteId { get; set; }
-        public bool PuedeVer { get; set; }
-        public bool PuedeEditar { get; set; }
-        public bool PuedeEliminar { get; set; }
+        public int permisoid { get; set; }
+        public int rolid { get; set; }
+        public int componenteid { get; set; }
+        public bool puedever { get; set; }
+        public bool puedeeditar { get; set; }
+        public bool puedeeliminar { get; set; }
 
         public Rol Rol { get; set; }
         public ComponentePantalla Componente { get; set; }

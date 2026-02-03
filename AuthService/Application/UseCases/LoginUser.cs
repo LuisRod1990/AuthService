@@ -15,7 +15,7 @@ namespace AuthService.Application.UseCases
         public TokenActivo Execute(string username, string password)
         {
             var user = _repo.FindByUsername(username);
-            if (user == null || !_hasher.Verify(password, user.PasswordHash))
+            if (user == null || !_hasher.Verify(password, user.passwordhash))
                 throw new Exception("Credenciales inválidas");
             var token = _tokenService.GenerateTokens(user);
             _tokenRepo.Save(token);

@@ -1,13 +1,16 @@
-﻿namespace AuthService.Domain.Entities
+﻿using AuthService.Domain.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
+
+[Table("usuarios", Schema = "dbo")]
+public class UsuarioSeguridad
 {
-    public class UsuarioSeguridad
-    {
-        public int UsuarioId { get; set; }
-        public string PasswordHash { get; set; }
-        public string Usuario { get; set; }
-        public Int16 EstatusId { get; set; }
-        public DateTime FechaCreacion { get; set; }
-        public DateTime? UltimoLogin { get; set; }
-        public ICollection<UsuarioRol> UsuariosRoles { get; set; }
-    }
+    public int usuarioid { get; set; }
+    public string passwordhash { get; set; }
+    public string usuario { get; set; }
+    public short estatusid { get; set; }
+    public DateTime fechacreacion { get; set; }
+    public DateTime? ultimologin { get; set; }
+
+    public ICollection<UsuarioRol> UsuariosRoles { get; set; }
+    public ICollection<TokenActivo> TokensActivos { get; set; } // 
 }

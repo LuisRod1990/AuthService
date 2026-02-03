@@ -2,12 +2,12 @@
 {
     public class UsuarioRol
     {
-        public int UsuarioRolId { get; set; }
-        public int UsuarioId { get; set; }
-        public int RolId { get; set; }
+        public int usuariorolid { get; set; }
+        public int usuarioid { get; set; }
+        public int rolid { get; set; }
 
-        public UsuarioSeguridad Usuario { get; set; }
-        public Rol Rol { get; set; }
+        public UsuarioSeguridad usuario { get; set; }
+        public Rol rol { get; set; }
 
     }
 }

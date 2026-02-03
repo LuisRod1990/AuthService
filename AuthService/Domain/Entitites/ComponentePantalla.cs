@@ -2,9 +2,9 @@
 {
     public class ComponentePantalla
     {
-        public int ComponenteId { get; set; }
-        public string Nombre { get; set; }
-        public int SubMenuId { get; set; }
+        public int componenteid { get; set; }
+        public string nombre { get; set; }
+        public int submenuid { get; set; }
 
         public SubMenu SubMenu { get; set; }
         public ICollection<PermisoComponente> Permisos { get; set; }

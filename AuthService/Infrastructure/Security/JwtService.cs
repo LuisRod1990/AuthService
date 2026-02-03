@@ -25,8 +25,8 @@ namespace AuthService.Infrastructure.Security
 
             var claims = new[]
             {
-                new Claim("usuarioId", usuario.UsuarioId.ToString()),
-                new Claim(ClaimTypes.Name, usuario.Usuario),
+                new Claim("usuarioId", usuario.usuarioid.ToString()),
+                new Claim(ClaimTypes.Name, usuario.usuario),
             };
 
             var accessToken = new JwtSecurityToken(
@@ -41,12 +41,14 @@ namespace AuthService.Infrastructure.Security
 
             return new TokenActivo
             {
-                UsuarioId = usuario.UsuarioId,
-                AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
-                RefreshToken = refreshToken,
-                FechaCreacion = _dateTimeProvider.NowMexico,
-                FechaExpiracion = _dateTimeProvider.NowMexico.AddMinutes(12),
-                Estado = "Activo"
+                usuarioid = usuario.usuarioid,
+                accesstoken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                refreshtoken = refreshToken,
+                //FechaCreacion = _dateTimeProvider.NowMexico,
+                //FechaExpiracion = _dateTimeProvider.NowMexico.AddMinutes(12),
+                fechacreacion = DateTime.UtcNow,
+                fechaexpiracion = DateTime.UtcNow.AddMinutes(12),
+                estado = "Activo"
             };
         }
     }

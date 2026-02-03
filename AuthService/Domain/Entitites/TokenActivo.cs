@@ -1,15 +1,19 @@
-﻿namespace AuthService.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
+namespace AuthService.Domain.Entities
 {
+    [Table("tokensactivos", Schema = "dbo")]
     public class TokenActivo
     {
-        public int TokenId { get; set; }
-        public int UsuarioId { get; set; }
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
-        public DateTime FechaCreacion { get; set; }
-        public DateTime FechaExpiracion { get; set; }
-        public string Estado { get; set; }
-
+        public int tokenid { get; set; }
+        public int usuarioid { get; set; }
+        public string accesstoken { get; set; }
+        public string refreshtoken { get; set; }
+        public DateTime fechacreacion { get; set; }
+        public DateTime fechaexpiracion { get; set; }
+        public string estado { get; set; }
+        //[JsonIgnore]
         public UsuarioSeguridad Usuario { get; set; }
 
     }

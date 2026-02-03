@@ -17,49 +17,58 @@ namespace AuthService.Infrastructure.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UsuarioSeguridad>().ToTable("Usuarios").HasKey(u => u.UsuarioId);
-            modelBuilder.Entity<Rol>().HasKey(r => r.RolId);
-            modelBuilder.Entity<UsuarioRol>().HasKey(ur => ur.UsuarioRolId);
-            modelBuilder.Entity<Menu>().HasKey(m => m.MenuId);
-            modelBuilder.Entity<SubMenu>().HasKey(sm => sm.SubMenuId);
-            modelBuilder.Entity<ComponentePantalla>().HasKey(c => c.ComponenteId);
-            modelBuilder.Entity<PermisoComponente>().HasKey(p => p.PermisoId);
-            modelBuilder.Entity<TokenActivo>().HasKey(t => t.TokenId);
+            modelBuilder.Entity<UsuarioSeguridad>().ToTable("usuarios", "dbo").HasKey(u => u.usuarioid);
+            modelBuilder.Entity<Rol>().HasKey(r => r.rolid);
+            modelBuilder.Entity<UsuarioRol>().HasKey(ur => ur.usuariorolid);
+            modelBuilder.Entity<Menu>().HasKey(m => m.menuid);
+            modelBuilder.Entity<SubMenu>().HasKey(sm => sm.submenuid);
+            modelBuilder.Entity<ComponentePantalla>().HasKey(c => c.componenteid);
+            modelBuilder.Entity<PermisoComponente>().HasKey(p => p.permisoid);
+            modelBuilder.Entity<TokenActivo>().HasKey(t => t.tokenid);
 
             modelBuilder.Entity<UsuarioRol>()
-                .HasOne(ur => ur.Usuario)
+                .HasOne(ur => ur.usuario)
                 .WithMany(u => u.UsuariosRoles)
-                .HasForeignKey(ur => ur.UsuarioId);
+                .HasForeignKey(ur => ur.usuarioid);
 
             modelBuilder.Entity<UsuarioRol>()
-                .HasOne(ur => ur.Rol)
+                .HasOne(ur => ur.rol)
                 .WithMany(r => r.UsuariosRoles)
-                .HasForeignKey(ur => ur.RolId);
+                .HasForeignKey(ur => ur.rolid);
 
             modelBuilder.Entity<SubMenu>()
                 .HasOne(sm => sm.Menu)
                 .WithMany(m => m.SubMenus)
-                .HasForeignKey(sm => sm.MenuId);
+                .HasForeignKey(sm => sm.menuid);
 
             modelBuilder.Entity<ComponentePantalla>()
                 .HasOne(c => c.SubMenu)
                 .WithMany(sm => sm.Componentes)
-                .HasForeignKey(c => c.SubMenuId);
+                .HasForeignKey(c => c.submenuid);
 
             modelBuilder.Entity<PermisoComponente>()
                 .HasOne(p => p.Rol)
                 .WithMany()
-                .HasForeignKey(p => p.RolId);
+                .HasForeignKey(p => p.rolid);
 
             modelBuilder.Entity<PermisoComponente>()
                 .HasOne(p => p.Componente)
                 .WithMany(c => c.Permisos)
-                .HasForeignKey(p => p.ComponenteId);
+                .HasForeignKey(p => p.componenteid);
 
             modelBuilder.Entity<TokenActivo>()
                 .HasOne(t => t.Usuario)
-                .WithMany()
-                .HasForeignKey(t => t.UsuarioId);
+                .WithMany(u => u.TokensActivos)
+                .HasForeignKey(t => t.usuarioid);
+
+            modelBuilder.Entity<UsuarioSeguridad>()
+                .Property(u => u.fechacreacion)
+                .HasColumnType("timestamp with time zone");
+
+            modelBuilder.Entity<UsuarioSeguridad>()
+                .Property(u => u.ultimologin)
+                .HasColumnType("timestamp with time zone");
+
         }
     }
 }

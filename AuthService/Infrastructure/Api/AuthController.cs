@@ -64,14 +64,14 @@ namespace AuthService.Api
         public IActionResult Refresh([FromBody] string refreshToken)
         {
             var oldToken = _tokenRepo.FindByRefreshToken(refreshToken);
-            if (oldToken == null || oldToken.Estado != "Activo")
+            if (oldToken == null || oldToken.estado != "Activo")
                 return Unauthorized("Refresh token inválido o expirado");
 
-            var usuario = _usuarioRepo.FindById(oldToken.UsuarioId);
-            if (usuario == null || usuario.EstatusId == 0)
+            var usuario = _usuarioRepo.FindById(oldToken.usuarioid);
+            if (usuario == null || usuario.estatusid == 0)
                 return Unauthorized("Usuario no válido");
 
-            _tokenRepo.RevokeToken(oldToken.AccessToken);
+            _tokenRepo.RevokeToken(oldToken.accesstoken);
             var newToken = _loginUser.RefreshExecute(usuario);
             return Ok(newToken);
         }

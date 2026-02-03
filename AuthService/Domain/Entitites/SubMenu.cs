@@ -2,9 +2,9 @@
 {
     public class SubMenu
     {
-        public int SubMenuId { get; set; }
-        public string Nombre { get; set; }
-        public int MenuId { get; set; }
+        public int submenuid { get; set; }
+        public string nombre { get; set; }
+        public int menuid { get; set; }
 
         public Menu Menu { get; set; }
         public ICollection<ComponentePantalla> Componentes { get; set; }
