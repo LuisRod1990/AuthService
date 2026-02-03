@@ -2,7 +2,7 @@ name: Deploy AuthService to EC2
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" ]   # Se ejecuta cuando haces push a la rama main
 
 jobs:
   build-and-deploy:
@@ -10,22 +10,22 @@ jobs:
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3   # Descarga tu código fuente
 
     - name: Build Docker image
-      run: docker build -t authservice:latest .
+      run: docker build -t authservice:latest .   # Construye la imagen Docker de tu API
 
     - name: Save Docker image
-      run: docker save authservice:latest | gzip > authservice.tar.gz
+      run: docker save authservice:latest | gzip > authservice.tar.gz   # Guarda la imagen en un archivo comprimido
 
     - name: Copy image to EC2
       uses: appleboy/scp-action@v0.1.7
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ec2-user
-        key: ${{ secrets.EC2_SSH_KEY }}
-        source: "authservice.tar.gz"
-        target: "/home/ec2-user/"
+        host: ${{ secrets.EC2_HOST }}            # IP pública de tu EC2
+        username: ec2-user                       # Usuario por defecto en Amazon Linux
+        key: ${{ secrets.EC2_SSH_KEY }}          # Clave privada para conectarte
+        source: "authservice.tar.gz"             # Archivo que se copia
+        target: "/home/ec2-user/"                # Carpeta destino en tu servidor
 
     - name: Load and run container on EC2 with HTTPS
       uses: appleboy/ssh-action@v0.1.7
@@ -34,24 +34,24 @@ jobs:
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # Asegura que Docker esté activo
-          sudo systemctl enable docker
-          sudo systemctl start docker
-          sudo usermod -aG docker ec2-user
+          # --- Configuración de Docker ---
+          sudo systemctl enable docker           # Activa Docker al inicio
+          sudo systemctl start docker            # Arranca Docker
+          sudo usermod -aG docker ec2-user       # Permite al usuario usar Docker
 
-          # Instala Nginx y Certbot si no están
+          # --- Instala Nginx y Certbot ---
           sudo yum install -y nginx
           sudo amazon-linux-extras enable epel
           sudo yum install -y certbot python3-certbot-nginx
 
-          # Arranca Nginx
+          # --- Arranca Nginx ---
           sudo systemctl enable nginx
           sudo systemctl start nginx
 
-          # Carga la imagen y levanta el contenedor
+          # --- Carga y corre el contenedor ---
           docker load < /home/ec2-user/authservice.tar.gz
-          docker stop authservice || true
-          docker rm authservice || true
+          docker stop authservice || true        # Detiene contenedor previo si existe
+          docker rm authservice || true          # Elimina contenedor previo
           docker run -d --name authservice -p 5000:5000 \
             -e CONN="${{ secrets.CONN }}" \
             -e CORS_HOST="${{ secrets.CORS_HOST }}" \
@@ -62,20 +62,12 @@ jobs:
             -e ASPNETCORE_URLS="http://+:5000" \
             authservice:latest
 
-          # Configuración Nginx para proxy HTTPS
+          # --- Configuración inicial de Nginx (solo HTTP) ---
+          # Este bloque permite que Certbot valide el dominio en puerto 80
           sudo tee /etc/nginx/conf.d/authservice.conf > /dev/null <<EOL
           server {
               listen 80;
               server_name larj-services.duckdns.org;
-              return 301 https://\$host\$request_uri;
-          }
-
-          server {
-              listen 443 ssl;
-              server_name larj-services.duckdns.org;
-
-              ssl_certificate /etc/letsencrypt/live/larj-services.duckdns.org/fullchain.pem;
-              ssl_certificate_key /etc/letsencrypt/live/larj-services.duckdns.org/privkey.pem;
 
               location / {
                   proxy_pass http://localhost:5000;
@@ -85,8 +77,9 @@ jobs:
           }
           EOL
 
-          # Genera certificado SSL con Let's Encrypt
+          # --- Genera y aplica certificado SSL automáticamente ---
+          # Certbot detecta el bloque HTTP y lo convierte en HTTPS
           sudo certbot --nginx -d larj-services.duckdns.org -m ${{ secrets.SSL_EMAIL }} --agree-tos --non-interactive
 
-          # Reinicia Nginx para aplicar cambios
+          # --- Reinicia Nginx para aplicar cambios ---
           sudo systemctl restart nginx
