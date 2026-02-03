@@ -13,7 +13,7 @@ namespace AuthService.Domain.Entities
         public DateTime fechacreacion { get; set; }
         public DateTime fechaexpiracion { get; set; }
         public string estado { get; set; }
-        //[JsonIgnore]
+        [JsonIgnore]
         public UsuarioSeguridad Usuario { get; set; }
 
     }

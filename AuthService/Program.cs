@@ -27,13 +27,6 @@ var corsHost = Environment.GetEnvironmentVariable("CORS_HOST") ?? "*";
 Console.WriteLine($"Connection String: {connectionString}");
 Console.WriteLine($"JWT Issuer: {jwtIssuer}, Audience: {jwtAudience}");
 
-// Evitar relaciones circulares en JSON
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-    });
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsName, policy =>
