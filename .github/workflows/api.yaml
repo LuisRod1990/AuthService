@@ -81,5 +81,5 @@ jobs:
           # Certbot detecta el bloque HTTP y lo convierte en HTTPS
           sudo certbot --nginx -d larj-services.duckdns.org -m ${{ secrets.SSL_EMAIL }} --agree-tos --non-interactive
 
-          # --- Reinicia Nginx para aplicar cambios ---
+          # --- Reinicia Nginx para aplicar cambios ------
           sudo systemctl restart nginx
