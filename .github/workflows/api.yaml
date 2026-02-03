@@ -50,7 +50,13 @@ jobs:
           docker load < /home/ec2-user/authservice.tar.gz
           docker stop authservice || true
           docker rm authservice || true
-          docker run -d --name authservice -p 5000:5000 authservice:latest
+          docker run -d --name authservice -p 5000:5000 \
+            -e CONN=${{ secrets.CONN }} \
+            -e CORS_HOST=${{ secrets.CORS_HOST }} \
+            -e CORS_NAME=${{ secrets.CORS_NAME }} \
+            -e JWT_AUDIENCE=${{ secrets.JWT_AUDIENCE }} \
+            -e JWT_ISSUER=${{ secrets.JWT_ISSUER }} \
+            -e JWT_KEY=${{ secrets.JWT_KEY }} \
+            -e ASPNETCORE_URLS=http://+:5000 \
+            authservice:latest
           EONG
-
-          
