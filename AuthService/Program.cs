@@ -118,7 +118,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Security API v1");
-    c.RoutePrefix = string.Empty; // Swagger en la raíz "/"
+    c.RoutePrefix = string.Empty;
 });
 
 app.UseAuthentication();
@@ -127,3 +127,4 @@ app.UseCors(corsName);
 
 app.MapControllers();
 app.Run();
+
