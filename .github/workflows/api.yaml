@@ -27,7 +27,7 @@ jobs:
         source: "authservice.tar.gz"
         target: "/home/ec2-user/"
 
-    - name: Load and run container on EC2
+    - name: Load and run container on EC2 with HTTPS
       uses: appleboy/ssh-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -37,9 +37,16 @@ jobs:
           # Asegura que Docker esté activo
           sudo systemctl enable docker
           sudo systemctl start docker
-
-          # Da permisos a ec2-user para usar Docker
           sudo usermod -aG docker ec2-user
+
+          # Instala Nginx y Certbot si no están
+          sudo yum install -y nginx
+          sudo amazon-linux-extras enable epel
+          sudo yum install -y certbot python3-certbot-nginx
+
+          # Arranca Nginx
+          sudo systemctl enable nginx
+          sudo systemctl start nginx
 
           # Carga la imagen y levanta el contenedor
           docker load < /home/ec2-user/authservice.tar.gz
@@ -54,3 +61,32 @@ jobs:
             -e JWT_KEY="${{ secrets.JWT_KEY }}" \
             -e ASPNETCORE_URLS="http://+:5000" \
             authservice:latest
+
+          # Configuración Nginx para proxy HTTPS
+          sudo tee /etc/nginx/conf.d/authservice.conf > /dev/null <<EOL
+          server {
+              listen 80;
+              server_name larj-services.duckdns.org;
+              return 301 https://\$host\$request_uri;
+          }
+
+          server {
+              listen 443 ssl;
+              server_name larj-services.duckdns.org;
+
+              ssl_certificate /etc/letsencrypt/live/larj-services.duckdns.org/fullchain.pem;
+              ssl_certificate_key /etc/letsencrypt/live/larj-services.duckdns.org/privkey.pem;
+
+              location / {
+                  proxy_pass http://localhost:5000;
+                  proxy_set_header Host \$host;
+                  proxy_set_header X-Real-IP \$remote_addr;
+              }
+          }
+          EOL
+
+          # Genera certificado SSL con Let's Encrypt
+          sudo certbot --nginx -d larj-services.duckdns.org -m ${{ secrets.SSL_EMAIL }} --agree-tos --non-interactive
+
+          # Reinicia Nginx para aplicar cambios
+          sudo systemctl restart nginx
