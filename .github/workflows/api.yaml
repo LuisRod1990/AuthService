@@ -52,3 +52,5 @@ jobs:
           docker rm authservice || true
           docker run -d --name authservice -p 5000:5000 authservice:latest
           EONG
+
+          
