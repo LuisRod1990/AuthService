@@ -65,7 +65,7 @@ jobs:
             -e ASPNETCORE_URLS="http://+:5000" \
             authservice:latest
 
-          # --- Configuración inicial de Nginx (solo HTTP) ---
+          # --- Configuración inicial de Nginx (solo HTTP) --- -- -- - -
           # Este bloque permite que Certbot valide el dominio en puerto 80
           sudo tee /etc/nginx/conf.d/authservice.conf > /dev/null <<EOL
           server {
