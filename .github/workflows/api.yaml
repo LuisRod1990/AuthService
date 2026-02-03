@@ -44,7 +44,10 @@ jobs:
           sudo amazon-linux-extras enable epel
           sudo yum install -y certbot python3-certbot-nginx
 
-          # --- Arranca Nginx ---
+          # --- Detiene Nginx si ya estaba corriendo ---
+          sudo systemctl stop nginx || true
+
+          # --- Arranca Nginx limpio ---
           sudo systemctl enable nginx
           sudo systemctl start nginx
 
@@ -81,5 +84,5 @@ jobs:
           # Certbot detecta el bloque HTTP y lo convierte en HTTPS
           sudo certbot --nginx -d larj-services.duckdns.org -m ${{ secrets.SSL_EMAIL }} --agree-tos --non-interactive
 
-          # --- Reinicia Nginx para aplicar cambios ------
+          # --- Reinicia Nginx para aplicar cambios ---
           sudo systemctl restart nginx
