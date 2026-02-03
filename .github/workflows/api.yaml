@@ -1,82 +1,49 @@
-name: CI/CD .NET 8 API
+name: Deploy AuthService to EC2
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ]   # Se ejecuta en cada push a la rama main
 
 jobs:
-  build-test-deploy:
-    runs-on: ubuntu-latest
-
-    env:
-      CONN: ${{ secrets.CONN }}
-      JWT_KEY: ${{ secrets.JWT_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      EC2_INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
-      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
-      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
-      CORS_NAME: ${{ secrets.CORS_NAME }}
-      CORS_HOST: ${{ secrets.CORS_HOST }}
+  build-and-deploy:
+    runs-on: ubuntu-latest   # GitHub usa Ubuntu para correr el pipeline
 
     steps:
-      # 1. Checkout del código
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v3
+      # Descarga tu código del repo
 
-      # 2. Instalar .NET 8
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+    - name: Build Docker image
+      run: docker build -t authservice:latest .
+      # Construye la imagen Docker con tu Dockerfile
 
-      # 3. Compilar
-      - name: Build
-        run: dotnet build --configuration Release
+    - name: Save Docker image
+      run: docker save authservice:latest | gzip > authservice.tar.gz
+      # Empaqueta la imagen en un archivo .tar.gz
 
-      # 4. Ejecutar pruebas en Release
-      - name: Test
-        run: dotnet test --configuration Release --verbosity normal
+    - name: Copy image to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}       # IP pública de tu instancia
+        username: ec2-user                  # Usuario correcto en Amazon Linux
+        key: ${{ secrets.EC2_SSH_KEY }}     # Llave privada .pem guardada como secreto
+        source: "authservice.tar.gz"
+        target: "/home/ec2-user/"
+      # Copia la imagen comprimida a tu instancia
 
-      # 5. Configurar credenciales de AWS
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+    - name: Load and run container on EC2
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # Asegura que Docker esté activo
+          sudo systemctl enable docker
+          sudo systemctl start docker
 
-      # 6. Build Docker image
-      - name: Build Docker image
-        run: docker build -t server-auth-api:latest .
-
-      # 7. Login a Amazon ECR
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      # 8. Crear repositorio en ECR si no existe
-      - name: Ensure ECR repository exists
-        run: |
-          aws ecr describe-repositories --repository-names server-auth-api --region ${{ env.AWS_REGION }} || \
-          aws ecr create-repository --repository-name server-auth-api --region ${{ env.AWS_REGION }}
-
-      # 9. Push de la imagen a ECR
-      - name: Push Docker image to ECR
-        run: |
-          docker tag server-auth-api:latest ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest
-          docker push ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest
-
-      # 10. Deploy en EC2 usando SSM
-      - name: Deploy to EC2
-        run: |
-          aws ssm send-command \
-            --targets "Key=instanceIds,Values=${{ env.EC2_INSTANCE_ID }}" \
-            --document-name "AWS-RunShellScript" \
-            --comment "Deploy API" \
-            --region ${{ env.AWS_REGION }} \
-            --parameters 'commands=["docker pull ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest","docker stop server-auth-api || true","docker rm server-auth-api || true","docker run -d -p 80:80 --name server-auth-api -e CONN=${{ env.CONN }} -e JWT_KEY=${{ env.JWT_KEY }} -e JWT_AUDIENCE=${{ env.JWT_AUDIENCE }} -e JWT_ISSUER=${{ env.JWT_ISSUER }} -e CORS_NAME=${{ env.CORS_NAME }} -e CORS_HOST=${{ env.CORS_HOST }} ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/server-auth-api:latest"]'
-            
-            
-            
+          # Carga la imagen y levanta el contenedor
+          docker load < /home/ec2-user/authservice.tar.gz
+          docker stop authservice || true
+          docker rm authservice || true
+          docker run -d --name authservice -p 5000:5000 authservice:latest
