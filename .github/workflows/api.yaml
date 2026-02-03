@@ -45,8 +45,7 @@ jobs:
           # Da permisos a ec2-user para usar Docker
           sudo usermod -aG docker ec2-user
 
-          # Aplica el grupo sin reiniciar sesión
-          newgrp docker <<EONG
+          # Carga la imagen y levanta el contenedor
           docker load < /home/ec2-user/authservice.tar.gz
           docker stop authservice || true
           docker rm authservice || true
@@ -59,4 +58,3 @@ jobs:
             -e JWT_KEY=${{ secrets.JWT_KEY }} \
             -e ASPNETCORE_URLS=http://+:5000 \
             authservice:latest
-          EONG
