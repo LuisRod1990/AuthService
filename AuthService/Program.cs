@@ -24,9 +24,6 @@ var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "Default
 var corsName = Environment.GetEnvironmentVariable("CORS_NAME") ?? "DefaultCors";
 var corsHost = Environment.GetEnvironmentVariable("CORS_HOST") ?? "*";
 
-Console.WriteLine($"Connection String: {connectionString}");
-Console.WriteLine($"JWT Issuer: {jwtIssuer}, Audience: {jwtAudience}");
-
 // Evitar relaciones circulares en JSON
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
