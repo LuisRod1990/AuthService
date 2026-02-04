@@ -42,7 +42,7 @@ public class AuthControllerTests
         var result = controller.Register(request) as OkObjectResult;
 
         mockRegisterUser.Verify(r => r.Execute("testuser", "password"), Times.Once);
-        Assert.Equal("Usuario registrado correctamente", result.Value);
+        Assert.Equal("Usuario registrado correctamente", result!.Value );
     }
 
     [Fact]
