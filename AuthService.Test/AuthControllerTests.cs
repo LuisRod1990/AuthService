@@ -48,7 +48,7 @@ public class AuthControllerTests
     [Fact]
     public void Login_ReturnsToken_WhenCredentialsAreValid()
     {
-        var fakeToken = new TokenActivo { AccessToken = "fake-jwt-token" };
+        var fakeToken = new TokenActivo { accesstoken = "fake-jwt-token" };
         var mockLoginUser = new Mock<ILoginUser>();
         mockLoginUser.Setup(l => l.Execute("testuser", "password")).Returns(fakeToken);
 
@@ -65,7 +65,7 @@ public class AuthControllerTests
 
         Assert.NotNull(result);
         var returnedToken = Assert.IsType<TokenActivo>(result.Value);
-        Assert.Equal("fake-jwt-token", returnedToken.AccessToken);
+        Assert.Equal("fake-jwt-token", returnedToken.accesstoken);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class AuthControllerTests
     [Fact]
     public void Refresh_ReturnsUnauthorized_WhenUserIsInvalid()
     {
-        var fakeToken = new TokenActivo { UsuarioId = 1, Estado = "Activo", AccessToken = "oldtoken" };
+        var fakeToken = new TokenActivo { usuarioid = 1, estado = "Activo", accesstoken = "oldtoken" };
         var mockTokenRepo = new Mock<ITokenRepository>();
         mockTokenRepo.Setup(r => r.FindByRefreshToken("validtoken")).Returns(fakeToken);
 
@@ -154,9 +154,9 @@ public class AuthControllerTests
     [Fact]
     public void Refresh_ReturnsNewToken_WhenValid()
     {
-        var fakeOldToken = new TokenActivo { UsuarioId = 1, Estado = "Activo", AccessToken = "oldtoken" };
-        var fakeUser = new UsuarioSeguridad { UsuarioId = 1, EstatusId = 1 };
-        var fakeNewToken = new TokenActivo { AccessToken = "newtoken" };
+        var fakeOldToken = new TokenActivo { usuarioid = 1, estado = "Activo", accesstoken = "oldtoken" };
+        var fakeUser = new UsuarioSeguridad { usuarioid = 1, estatusid = 1 };
+        var fakeNewToken = new TokenActivo { accesstoken = "newtoken" };
 
         var mockTokenRepo = new Mock<ITokenRepository>();
         mockTokenRepo.Setup(r => r.FindByRefreshToken("validtoken")).Returns(fakeOldToken);
@@ -179,6 +179,6 @@ public class AuthControllerTests
 
         Assert.NotNull(result);
         var returnedToken = Assert.IsType<TokenActivo>(result.Value);
-        Assert.Equal("newtoken", returnedToken.AccessToken);
+        Assert.Equal("newtoken", returnedToken.accesstoken);
     }
 }
