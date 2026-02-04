@@ -8,10 +8,10 @@ public class UsuarioSeguridad
     public int UsuarioId { get; set; }
 
     [Column("passwordhash")]
-    public required string PasswordHash { get; set; } = string.Empty;
+    public required string PasswordHash { get; set; }
 
     [Column("usuario")]
-    public required string Usuario { get; set; } = string.Empty;
+    public required string Usuario { get; set; }
 
     [Column("estatusid")]
     public short EstatusId { get; set; }
