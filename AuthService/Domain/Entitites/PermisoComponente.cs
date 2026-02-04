@@ -1,13 +1,21 @@
-﻿namespace AuthService.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace AuthService.Domain.Entities
 {
     public class PermisoComponente
     {
-        public int permisoid { get; set; }
-        public int rolid { get; set; }
-        public int componenteid { get; set; }
-        public bool puedever { get; set; }
-        public bool puedeeditar { get; set; }
-        public bool puedeeliminar { get; set; }
+        [Column("permisoid")]
+        public int PermisoId { get; set; }
+        [Column("rolid")]
+        public int RolId { get; set; }
+        [Column("componenteid")]
+        public int ComponenteId { get; set; }
+        [Column("puedever")]
+        public bool PuedeVer { get; set; }
+        [Column("puedeeditar")]
+        public bool PuedeEditar { get; set; }
+        [Column("puedeeliminar")]
+        public bool puedeEliminar { get; set; }
 
         public required Rol Rol { get; set; }
         public required ComponentePantalla Componente { get; set; }

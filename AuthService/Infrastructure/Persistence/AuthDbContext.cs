@@ -22,8 +22,8 @@ namespace AuthService.Infrastructure.Persistence
             modelBuilder.Entity<UsuarioRol>().HasKey(ur => ur.UsuarioRolId);
             modelBuilder.Entity<Menu>().HasKey(m => m.MenuId);
             modelBuilder.Entity<SubMenu>().HasKey(sm => sm.SubMenuId);
-            modelBuilder.Entity<ComponentePantalla>().HasKey(c => c.componenteid);
-            modelBuilder.Entity<PermisoComponente>().HasKey(p => p.permisoid);
+            modelBuilder.Entity<ComponentePantalla>().HasKey(c => c.ComponenteId);
+            modelBuilder.Entity<PermisoComponente>().HasKey(p => p.PermisoId);
             modelBuilder.Entity<TokenActivo>().HasKey(t => t.TokenId);
 
             modelBuilder.Entity<UsuarioRol>()
@@ -44,17 +44,17 @@ namespace AuthService.Infrastructure.Persistence
             modelBuilder.Entity<ComponentePantalla>()
                 .HasOne(c => c.SubMenu)
                 .WithMany(sm => sm.Componentes)
-                .HasForeignKey(c => c.submenuid);
+                .HasForeignKey(c => c.SubMenuId);
 
             modelBuilder.Entity<PermisoComponente>()
                 .HasOne(p => p.Rol)
                 .WithMany()
-                .HasForeignKey(p => p.rolid);
+                .HasForeignKey(p => p.RolId);
 
             modelBuilder.Entity<PermisoComponente>()
                 .HasOne(p => p.Componente)
                 .WithMany(c => c.Permisos)
-                .HasForeignKey(p => p.componenteid);
+                .HasForeignKey(p => p.ComponenteId);
 
             modelBuilder.Entity<TokenActivo>()
                 .HasOne(t => t.Usuario)
