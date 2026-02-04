@@ -5,17 +5,29 @@ namespace AuthService.Domain.Entities
     [Table("tokensactivos", Schema = "dbo")]
     public class TokenActivo
     {
-        public int tokenid { get; set; }
-        public int usuarioid { get; set; }
-        public string accesstoken { get; set; }
-        public string refreshtoken { get; set; }
-        public DateTime fechacreacion { get; set; }
-        public DateTime fechaexpiracion { get; set; }
-        public string estado { get; set; }
-        //[JsonIgnore]
+        [Column("tokenid")]
+        public int TokenId { get; set; }
 
-        public UsuarioSeguridad Usuario { get; set; }
+        [Column("usuarioid")]
+        public int UsuarioId { get; set; }
 
+        [Column("accesstoken")]
+        public required string AccessToken { get; set; }
+
+        [Column("refreshtoken")]
+        public required string RefreshToken { get; set; }
+
+        [Column("fechacreacion")]
+        public DateTime FechaCreacion { get; set; }
+
+        [Column("fechaexpiracion")]
+        public DateTime FechaExpiracion { get; set; }
+
+        [Column("estado")]
+        public required string Estado { get; set; }
+
+
+        public required UsuarioSeguridad Usuario { get; set; }
     }
 }
 

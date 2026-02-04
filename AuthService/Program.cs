@@ -24,6 +24,11 @@ var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "Default
 var corsName = Environment.GetEnvironmentVariable("CORS_NAME") ?? "DefaultCors";
 var corsHost = Environment.GetEnvironmentVariable("CORS_HOST") ?? "*";
 
+if (string.IsNullOrEmpty(jwtKey))
+    throw new InvalidOperationException("JWT key is not configured.");
+
+var key = Encoding.UTF8.GetBytes(jwtKey);
+
 // Evitar relaciones circulares en JSON
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -52,7 +57,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey ?? throw new ArgumentNullException(nameof(jwtKey))))
+            IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
 

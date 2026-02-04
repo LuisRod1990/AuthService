@@ -17,16 +17,20 @@ namespace AuthService.Infrastructure.Security
         }
         public TokenActivo GenerateTokens(UsuarioSeguridad usuario)
         {
-            var key = Environment.GetEnvironmentVariable("JWT_KEY");
+            var jwt_key = Environment.GetEnvironmentVariable("JWT_KEY");
             var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
             var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+
+            if (string.IsNullOrEmpty(jwt_key))
+                throw new InvalidOperationException("JWT key is not configured.");
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt_key));
             var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim("usuarioId", usuario.usuarioid.ToString()),
-                new Claim(ClaimTypes.Name, usuario.usuario),
+                new Claim("usuarioId", usuario.UsuarioId.ToString()),
+                new Claim(ClaimTypes.Name, usuario.Usuario),
             };
 
             var accessToken = new JwtSecurityToken(
@@ -41,14 +45,15 @@ namespace AuthService.Infrastructure.Security
 
             return new TokenActivo
             {
-                usuarioid = usuario.usuarioid,
-                accesstoken = new JwtSecurityTokenHandler().WriteToken(accessToken),
-                refreshtoken = refreshToken,
+                UsuarioId = usuario.UsuarioId,
+                AccessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                RefreshToken = refreshToken,
                 //FechaCreacion = _dateTimeProvider.NowMexico,
                 //FechaExpiracion = _dateTimeProvider.NowMexico.AddMinutes(12),
-                fechacreacion = DateTime.UtcNow,
-                fechaexpiracion = DateTime.UtcNow.AddMinutes(12),
-                estado = "Activo"
+                FechaCreacion = DateTime.UtcNow,
+                FechaExpiracion = DateTime.UtcNow.AddMinutes(12),
+                Estado = "Activo",
+                Usuario = usuario
             };
         }
     }

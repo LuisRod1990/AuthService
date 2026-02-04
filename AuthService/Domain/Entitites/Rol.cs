@@ -1,12 +1,20 @@
-﻿namespace AuthService.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace AuthService.Domain.Entities
 {
     public class Rol
     {
-        public int rolid { get; set; }
-        public string nombre { get; set; }
-        public string descripcion { get; set; }
+        [Column("rolid")]
+        public int RolId { get; set; }
 
-        public ICollection<UsuarioRol> UsuariosRoles { get; set; }
+        [Column("nombre")]
+        public required string Nombre { get; set; }
 
+        [Column("descripcion")]
+        public string? Descripcion { get; set; }
+
+
+
+        public ICollection<UsuarioRol>? UsuariosRoles { get; set; }
     }
 }

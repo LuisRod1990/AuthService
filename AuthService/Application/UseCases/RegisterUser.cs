@@ -21,13 +21,12 @@ namespace AuthService.Application.UseCases
             var hash = _hasher.Hash(password);
             var user = new UsuarioSeguridad
             {
-                usuario = username
-                ,
-                passwordhash = hash
-                ,
-                estatusid = 0
-                ,
-                fechacreacion = DateTime.UtcNow
+                Usuario = username,
+                PasswordHash = hash,
+                EstatusId = 0,
+                FechaCreacion = DateTime.UtcNow,
+                UsuariosRoles = new List<UsuarioRol>(),
+                TokensActivos = new List<TokenActivo>()
             };
             _repo.Save(user);
         }

@@ -1,13 +1,20 @@
-﻿namespace AuthService.Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace AuthService.Domain.Entities
 {
     public class SubMenu
     {
-        public int submenuid { get; set; }
-        public string nombre { get; set; }
-        public int menuid { get; set; }
+        [Column("submenuid")]
+        public int SubMenuId { get; set; }
 
-        public Menu Menu { get; set; }
-        public ICollection<ComponentePantalla> Componentes { get; set; }
+        [Column("nombre")]
+        public required string Nombre { get; set; }
 
+        [Column("menuid")]
+        public int MenuId { get; set; }
+
+
+        public required Menu Menu { get; set; }
+        public required ICollection<ComponentePantalla> Componentes { get; set; }
     }
 }

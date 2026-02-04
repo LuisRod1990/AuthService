@@ -9,8 +9,7 @@
         public bool puedeeditar { get; set; }
         public bool puedeeliminar { get; set; }
 
-        public Rol Rol { get; set; }
-        public ComponentePantalla Componente { get; set; }
-
+        public required Rol Rol { get; set; }
+        public required ComponentePantalla Componente { get; set; }
     }
 }

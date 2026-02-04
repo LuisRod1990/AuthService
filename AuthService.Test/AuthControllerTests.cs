@@ -48,7 +48,26 @@ public class AuthControllerTests
     [Fact]
     public void Login_ReturnsToken_WhenCredentialsAreValid()
     {
-        var fakeToken = new TokenActivo { accesstoken = "fake-jwt-token" };
+        var fakeToken = new TokenActivo
+        {
+            TokenId = 0,
+            UsuarioId = 1,
+            AccessToken = "oldtoken",
+            RefreshToken = "refresh-token",
+            FechaCreacion = DateTime.UtcNow,
+            FechaExpiracion = DateTime.UtcNow.AddHours(1),
+            Estado = "Activo",
+            Usuario = new UsuarioSeguridad
+            {
+                UsuarioId = 1,
+                PasswordHash = "dummyhash",
+                Usuario = "testuser",
+                EstatusId = 1,
+                FechaCreacion = DateTime.UtcNow,
+                UsuariosRoles = new List<UsuarioRol>(),
+                TokensActivos = new List<TokenActivo>()
+            }
+        };
         var mockLoginUser = new Mock<ILoginUser>();
         mockLoginUser.Setup(l => l.Execute("testuser", "password")).Returns(fakeToken);
 
@@ -65,7 +84,7 @@ public class AuthControllerTests
 
         Assert.NotNull(result);
         var returnedToken = Assert.IsType<TokenActivo>(result.Value);
-        Assert.Equal("fake-jwt-token", returnedToken.accesstoken);
+        Assert.Equal("fake-jwt-token", returnedToken.AccessToken);
     }
 
     [Fact]
@@ -104,14 +123,15 @@ public class AuthControllerTests
         var result = controller.UpdatePassword(request) as OkObjectResult;
 
         mockUpdatePassword.Verify(u => u.Execute(1, "newpass"), Times.Once);
-        Assert.Equal("Contraseña actualizada correctamente", result.Value);
+        Assert.NotNull(result);
+        Assert.Equal("Contraseña actualizada correctamente", result!.Value);
     }
 
     [Fact]
     public void Refresh_ReturnsUnauthorized_WhenTokenIsInvalid()
     {
         var mockTokenRepo = new Mock<ITokenRepository>();
-        mockTokenRepo.Setup(r => r.FindByRefreshToken("badtoken")).Returns((TokenActivo)null);
+        mockTokenRepo.Setup(r => r.FindByRefreshToken("badtoken")).Returns((TokenActivo?)null);
 
         var controller = new AuthController(
             new Mock<IRegisterUser>().Object,
@@ -130,12 +150,31 @@ public class AuthControllerTests
     [Fact]
     public void Refresh_ReturnsUnauthorized_WhenUserIsInvalid()
     {
-        var fakeToken = new TokenActivo { usuarioid = 1, estado = "Activo", accesstoken = "oldtoken" };
+        var fakeToken = new TokenActivo
+        {
+            TokenId = 0,
+            UsuarioId = 1,
+            AccessToken = "oldtoken",
+            RefreshToken = "refresh-token",
+            FechaCreacion = DateTime.UtcNow,
+            FechaExpiracion = DateTime.UtcNow.AddHours(1),
+            Estado = "Activo",
+            Usuario = new UsuarioSeguridad
+            {
+                UsuarioId = 1,
+                PasswordHash = "dummyhash",
+                Usuario = "testuser",
+                EstatusId = 1,
+                FechaCreacion = DateTime.UtcNow,
+                UsuariosRoles = new List<UsuarioRol>(),
+                TokensActivos = new List<TokenActivo>()
+            }
+        };
         var mockTokenRepo = new Mock<ITokenRepository>();
         mockTokenRepo.Setup(r => r.FindByRefreshToken("validtoken")).Returns(fakeToken);
 
         var mockUsuarioRepo = new Mock<IUsuarioSeguridadRepository>();
-        mockUsuarioRepo.Setup(r => r.FindById(1)).Returns((UsuarioSeguridad)null);
+        mockUsuarioRepo.Setup(r => r.FindById(1)).Returns((UsuarioSeguridad?)null);
 
         var controller = new AuthController(
             new Mock<IRegisterUser>().Object,
@@ -154,9 +193,56 @@ public class AuthControllerTests
     [Fact]
     public void Refresh_ReturnsNewToken_WhenValid()
     {
-        var fakeOldToken = new TokenActivo { usuarioid = 1, estado = "Activo", accesstoken = "oldtoken" };
-        var fakeUser = new UsuarioSeguridad { usuarioid = 1, estatusid = 1 };
-        var fakeNewToken = new TokenActivo { accesstoken = "newtoken" };
+        var fakeOldToken = new TokenActivo
+        {
+            TokenId = 0,
+            UsuarioId = 1,
+            AccessToken = "oldtoken",
+            RefreshToken = "refresh-token",
+            FechaCreacion = DateTime.UtcNow,
+            FechaExpiracion = DateTime.UtcNow.AddHours(1),
+            Estado = "Activo",
+            Usuario = new UsuarioSeguridad
+            {
+                UsuarioId = 1,
+                PasswordHash = "dummyhash",
+                Usuario = "testuser",
+                EstatusId = 1,
+                FechaCreacion = DateTime.UtcNow,
+                UsuariosRoles = new List<UsuarioRol>(),
+                TokensActivos = new List<TokenActivo>()
+            }
+        };
+        var fakeUser = new UsuarioSeguridad
+        {
+            UsuarioId = 1,
+            PasswordHash = "dummyhash",
+            Usuario = "testuser",
+            EstatusId = 1,
+            FechaCreacion = DateTime.UtcNow,
+            UsuariosRoles = new List<UsuarioRol>(),
+            TokensActivos = new List<TokenActivo>()
+        };
+        var fakeNewToken = new TokenActivo
+        {
+            TokenId = 0,
+            UsuarioId = 1,
+            AccessToken = "newtoken",
+            RefreshToken = "refresh-token",
+            FechaCreacion = DateTime.UtcNow,
+            FechaExpiracion = DateTime.UtcNow.AddHours(1),
+            Estado = "Activo",
+            Usuario = new UsuarioSeguridad
+            {
+                UsuarioId = 1,
+                PasswordHash = "dummyhash",
+                Usuario = "testuser",
+                EstatusId = 1,
+                FechaCreacion = DateTime.UtcNow,
+                UsuariosRoles = new List<UsuarioRol>(),
+                TokensActivos = new List<TokenActivo>()
+            }
+        };
 
         var mockTokenRepo = new Mock<ITokenRepository>();
         mockTokenRepo.Setup(r => r.FindByRefreshToken("validtoken")).Returns(fakeOldToken);
@@ -179,6 +265,6 @@ public class AuthControllerTests
 
         Assert.NotNull(result);
         var returnedToken = Assert.IsType<TokenActivo>(result.Value);
-        Assert.Equal("newtoken", returnedToken.accesstoken);
+        Assert.Equal("newtoken", returnedToken.AccessToken);
     }
 }

@@ -14,7 +14,7 @@ namespace AuthService.Infrastructure.Persistence
         public void UpdatePassword(int usuarioId, string newPasswordHash)
         {
             var user = _context.UsuariosSeguridad.Find(usuarioId);
-            if (user != null) { user.passwordhash = newPasswordHash; _context.SaveChanges(); }
+            if (user != null) { user.PasswordHash = newPasswordHash; _context.SaveChanges(); }
         }
 
     }

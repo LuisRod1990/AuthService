@@ -4,13 +4,24 @@ using System.ComponentModel.DataAnnotations.Schema;
 [Table("usuarios", Schema = "dbo")]
 public class UsuarioSeguridad
 {
-    public int usuarioid { get; set; }
-    public string passwordhash { get; set; }
-    public string usuario { get; set; }
-    public short estatusid { get; set; }
-    public DateTime fechacreacion { get; set; }
-    public DateTime? ultimologin { get; set; }
+    [Column("usuarioid")]
+    public int UsuarioId { get; set; }
 
-    public ICollection<UsuarioRol> UsuariosRoles { get; set; }
-    public ICollection<TokenActivo> TokensActivos { get; set; } // 
+    [Column("passwordhash")]
+    public required string PasswordHash { get; set; }
+
+    [Column("usuario")]
+    public required string Usuario { get; set; }
+
+    [Column("estatusid")]
+    public short EstatusId { get; set; }
+
+    [Column("fechacreacion")]
+    public DateTime FechaCreacion { get; set; }
+
+    [Column("ultimologin")]
+    public DateTime? UltimoLogin { get; set; }
+
+    public required ICollection<UsuarioRol> UsuariosRoles { get; set; }
+    public required ICollection<TokenActivo> TokensActivos { get; set; }
 }
