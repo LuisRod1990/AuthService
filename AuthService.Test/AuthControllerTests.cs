@@ -52,7 +52,7 @@ public class AuthControllerTests
         {
             TokenId = 0,
             UsuarioId = 1,
-            AccessToken = "oldtoken",
+            AccessToken = "fake-jwt-token",
             RefreshToken = "refresh-token",
             FechaCreacion = DateTime.UtcNow,
             FechaExpiracion = DateTime.UtcNow.AddHours(1),
