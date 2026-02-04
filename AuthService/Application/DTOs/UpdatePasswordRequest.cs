@@ -1,8 +1,12 @@
-﻿namespace AuthService.Application.DTOs
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AuthService.Application.DTOs
 {
     public class UpdatePasswordRequest
     {
+        [Required]
         public int UsuarioId { get; set; }
-        public string NewPassword { get; set; }
+        [Required]
+        public string NewPassword { get; set; } = string.Empty;
     }
 }
