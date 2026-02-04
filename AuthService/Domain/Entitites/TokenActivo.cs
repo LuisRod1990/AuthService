@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace AuthService.Domain.Entities
 {
@@ -19,3 +18,4 @@ namespace AuthService.Domain.Entities
 
     }
 }
+
