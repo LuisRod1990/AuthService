@@ -130,10 +130,10 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty;
 });
 
+app.UseCors(corsName);
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors(corsName);
 
 app.MapControllers();
 app.Run();
