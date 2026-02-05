@@ -13,7 +13,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Logging a consola
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
@@ -137,7 +136,3 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
-
-
-
-
