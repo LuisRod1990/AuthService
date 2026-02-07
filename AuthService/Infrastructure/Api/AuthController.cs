@@ -59,7 +59,7 @@ namespace AuthService.Api
             _updatePassword.Execute(request.UsuarioId, request.NewPassword);
             return Ok("Contraseña actualizada correctamente");
         }
-        //[AllowAnonymous]
+        [AllowAnonymous]
         [HttpPost("refresh")]
         public IActionResult Refresh([FromBody] string refreshToken)
         {
