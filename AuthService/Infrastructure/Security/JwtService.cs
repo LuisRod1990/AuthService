@@ -37,7 +37,8 @@ namespace AuthService.Infrastructure.Security
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: _dateTimeProvider.NowMexico.AddMinutes(12),
+                //expires: _dateTimeProvider.NowMexico.AddMinutes(12),
+                expires: DateTime.UtcNow.AddMinutes(12),
                 signingCredentials: creds
             );
 
