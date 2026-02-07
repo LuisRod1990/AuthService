@@ -61,9 +61,9 @@ namespace AuthService.Api
         }
         [AllowAnonymous]
         [HttpPost("refresh")]
-        public IActionResult Refresh([FromBody] string refreshToken)
+        public IActionResult Refresh([FromBody] RefreshRequest request)
         {
-            var oldToken = _tokenRepo.FindByRefreshToken(refreshToken);
+            var oldToken = _tokenRepo.FindByRefreshToken(request.RefreshToken);
             if (oldToken == null || oldToken.Estado != "Activo")
                 return Unauthorized("Refresh token inválido o expirado");
 
@@ -75,5 +75,6 @@ namespace AuthService.Api
             var newToken = _loginUser.RefreshExecute(usuario);
             return Ok(newToken);
         }
+
     }
 }
