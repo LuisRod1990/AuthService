@@ -141,7 +141,7 @@ public class AuthControllerTests
             new Mock<IUsuarioSeguridadRepository>().Object
         );
 
-        var result = controller.Refresh("badtoken") as UnauthorizedObjectResult;
+        var result = controller.Refresh(new RefreshRequest { RefreshToken = "badtoken" }) as UnauthorizedObjectResult;
 
         Assert.NotNull(result);
         Assert.Equal("Refresh token inválido o expirado", result.Value);
@@ -184,7 +184,7 @@ public class AuthControllerTests
             mockUsuarioRepo.Object
         );
 
-        var result = controller.Refresh("validtoken") as UnauthorizedObjectResult;
+        var result = controller.Refresh(new RefreshRequest { RefreshToken = "validtoken" }) as UnauthorizedObjectResult;
 
         Assert.NotNull(result);
         Assert.Equal("Usuario no válido", result.Value);
@@ -261,7 +261,7 @@ public class AuthControllerTests
             mockUsuarioRepo.Object
         );
 
-        var result = controller.Refresh("validtoken") as OkObjectResult;
+        var result = controller.Refresh(new RefreshRequest { RefreshToken = "validtoken" }) as OkObjectResult;
 
         Assert.NotNull(result);
         var returnedToken = Assert.IsType<TokenActivo>(result.Value);
