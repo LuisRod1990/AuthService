@@ -38,7 +38,7 @@ namespace AuthService.Infrastructure.Security
                 audience: audience,
                 claims: claims,
                 //expires: _dateTimeProvider.NowMexico.AddMinutes(12),
-                expires: DateTime.UtcNow.AddMinutes(12),
+                expires: DateTime.UtcNow.AddDays(30),
                 signingCredentials: creds
             );
 
@@ -52,7 +52,7 @@ namespace AuthService.Infrastructure.Security
                 //FechaCreacion = _dateTimeProvider.NowMexico,
                 //FechaExpiracion = _dateTimeProvider.NowMexico.AddMinutes(12),
                 FechaCreacion = DateTime.UtcNow,
-                FechaExpiracion = DateTime.UtcNow.AddMinutes(12),
+                FechaExpiracion = DateTime.UtcNow.AddDays(30),
                 Estado = "Activo",
                 Usuario = usuario
             };
