@@ -22,13 +22,13 @@ namespace AuthService.Infrastructure.Adapters
             var logEntry = new LogEntry
             {
                 LogDate = loggingEvent.TimeStamp,
-                LogLevel = loggingEvent.Level.Name ?? string.Empty,
-                Logger = loggingEvent.LoggerName ?? string.Empty,
-                Message = loggingEvent.RenderedMessage ?? string.Empty,
-                Exception = loggingEvent.GetExceptionString() ?? string.Empty,
-                Thread = loggingEvent.ThreadName ?? string.Empty,
-                UserName = Environment.UserName,
-                MachineName = Environment.MachineName
+                LogLevel = loggingEvent?.Level?.Name ?? string.Empty,
+                Logger = loggingEvent?.LoggerName ?? string.Empty,
+                Message = loggingEvent?.RenderedMessage ?? string.Empty,
+                Exception = loggingEvent?.ExceptionObject?.ToString() ?? string.Empty,
+                Thread = loggingEvent?.ThreadName ?? string.Empty,
+                UserName = Environment.UserName ?? string.Empty,
+                MachineName = Environment.MachineName ?? string.Empty
             };
             context.Logs.Add(logEntry);
             context.SaveChanges();
