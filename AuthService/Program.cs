@@ -39,9 +39,19 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy(corsName, policy =>
     {
-        policy.WithOrigins("http://localhost:4200", corsHost)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.WithOrigins(
+            "https://localhost",
+            "http://localhost",
+            "http://localhost:4200",
+            "https://localhost:9090",
+            "https://192.168.17.59:9090",
+            "http://192.168.17.59",
+            "https://portfolio-lrguez.duckdns.org",
+            "http://ec2-3-142-208-223.us-east-2.compute.amazonaws.com/",
+            corsHost
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod();
     });
 });
 

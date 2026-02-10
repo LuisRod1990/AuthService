@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AuthService.Domain.Entities;
+using AuthService.Domain.Entitites;
 
 namespace AuthService.Infrastructure.Persistence
 {
@@ -15,6 +16,9 @@ namespace AuthService.Infrastructure.Persistence
         public DbSet<PermisoComponente> PermisosComponentes { get; set; }
         public DbSet<TokenActivo> TokensActivos { get; set; }
 
+        // Agrega el DbSet para LogEntry - Log4Net
+        public DbSet<LogEntry> Logs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UsuarioSeguridad>().ToTable("usuarios", "dbo").HasKey(u => u.UsuarioId);
@@ -25,6 +29,12 @@ namespace AuthService.Infrastructure.Persistence
             modelBuilder.Entity<ComponentePantalla>().HasKey(c => c.ComponenteId);
             modelBuilder.Entity<PermisoComponente>().HasKey(p => p.PermisoId);
             modelBuilder.Entity<TokenActivo>().HasKey(t => t.TokenId);
+
+            modelBuilder.Entity<LogEntry>().ToTable("logs", "dbo").HasKey(l => l.Id);
+
+            modelBuilder.Entity<LogEntry>()
+                .Property(l => l.LogDate)
+                .HasColumnType("timestamp with time zone");
 
             modelBuilder.Entity<UsuarioRol>()
                 .HasOne(ur => ur.Usuario)

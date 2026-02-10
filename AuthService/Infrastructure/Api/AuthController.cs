@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using AuthService.Application.DTOs;
+﻿using AuthService.Application.DTOs;
 using AuthService.Application.UseCases;
 using AuthService.Domain.Repositories;
+using log4net;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AuthService.Api
 {
@@ -11,6 +12,7 @@ namespace AuthService.Api
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(AuthController));
         private readonly IRegisterUser _registerUser;
         private readonly ILoginUser _loginUser;
         private readonly ITokenRepository _tokenRepo;
@@ -64,17 +66,34 @@ namespace AuthService.Api
         [HttpPost("refresh")]
         public IActionResult Refresh([FromBody] RefreshRequest request)
         {
-            var oldToken = _tokenRepo.FindByRefreshToken(request.RefreshToken);
-            if (oldToken == null || oldToken.Estado != "Activo")
-                return Unauthorized("Refresh token inválido o expirado");
+            try
+            {
+                var oldToken = _tokenRepo.FindByRefreshToken(request.RefreshToken);
+                if (oldToken == null || oldToken.Estado != "Activo")
+                {
+                    log.Warn("Intento de refresh con token inválido o expirado");
+                    return Unauthorized("Refresh token inválido o expirado");
+                }
 
-            var usuario = _usuarioRepo.FindById(oldToken.UsuarioId);
-            if (usuario == null || usuario.EstatusId == 0)
-                return Unauthorized("Usuario no válido");
+                var usuario = _usuarioRepo.FindById(oldToken.UsuarioId);
+                if (usuario == null || usuario.EstatusId == 0)
+                {
+                    log.Warn($"Usuario no válido. Id: {oldToken.UsuarioId}");
+                    return Unauthorized("Usuario no válido");
+                }
 
-            _tokenRepo.RevokeToken(oldToken.AccessToken);
-            var newToken = _loginUser.RefreshExecute(usuario);
-            return Ok(newToken);
+                _tokenRepo.RevokeToken(oldToken.AccessToken);
+                var newToken = _loginUser.RefreshExecute(usuario);
+
+                log.Info($"Token refrescado correctamente para usuario {usuario.Usuario}");
+                return Ok(newToken);
+            }
+            catch (Exception ex)
+            {
+                // Aquí capturas cualquier error inesperado
+                log.Error("Error en Refresh()", ex);
+                return StatusCode(500, "Ocurrió un error interno");
+            }
         }
 
     }
