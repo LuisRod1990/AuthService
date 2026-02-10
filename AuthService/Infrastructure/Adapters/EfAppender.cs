@@ -22,7 +22,7 @@ namespace AuthService.Infrastructure.Adapters
             var logEntry = new LogEntry
             {
                 LogDate = loggingEvent.TimeStamp,
-                LogLevel = loggingEvent.Level.Name,
+                LogLevel = loggingEvent.Level.Name ?? string.Empty,
                 Logger = loggingEvent.LoggerName ?? string.Empty,
                 Message = loggingEvent.RenderedMessage ?? string.Empty,
                 Exception = loggingEvent.GetExceptionString() ?? string.Empty,
