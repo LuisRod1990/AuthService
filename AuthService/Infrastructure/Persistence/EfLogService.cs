@@ -11,7 +11,7 @@ namespace AuthService.Infrastructure.Persistence
             _context = context;
         }
 
-        public async Task SaveLogAsync(string level, string logger, string message, Exception ex = null)
+        public async Task SaveLogAsync(string level, string logger, string message, Exception ?ex = null)
         {
             var logEntry = new LogEntry
             {
@@ -19,7 +19,7 @@ namespace AuthService.Infrastructure.Persistence
                 LogLevel = level,
                 Logger = logger,
                 Message = message,
-                Exception = ex?.ToString(),
+                Exception = string.IsNullOrEmpty(ex.ToString())? "No exception catched!" : ex.ToString(),
                 Thread = Thread.CurrentThread.ManagedThreadId.ToString(),
                 UserName = Environment.UserName,
                 MachineName = Environment.MachineName
