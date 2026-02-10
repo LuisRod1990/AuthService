@@ -11,22 +11,41 @@ namespace AuthService.Infrastructure.Persistence
             _context = context;
         }
 
-        public async Task SaveLogAsync(string level, string logger, string message, Exception ?ex = null)
+        public async Task SaveLogAsync(string level, string logger, string message, Exception? ex = null)
         {
-            var logEntry = new LogEntry
+            if (ex != null)
             {
-                LogDate = DateTime.UtcNow,
-                LogLevel = level,
-                Logger = logger,
-                Message = message,
-                Exception = string.IsNullOrEmpty(ex.ToString())? "No exception catched!" : ex.ToString(),
-                Thread = Thread.CurrentThread.ManagedThreadId.ToString(),
-                UserName = Environment.UserName,
-                MachineName = Environment.MachineName
-            };
+                var logEntry = new LogEntry
+                {
+                    LogDate = DateTime.UtcNow,
+                    LogLevel = level,
+                    Logger = logger,
+                    Message = message,
+                    Exception = string.IsNullOrEmpty(ex.ToString()) ? "No Exception!" : ex.ToString(),
+                    Thread = Thread.CurrentThread.ManagedThreadId.ToString(),
+                    UserName = Environment.UserName,
+                    MachineName = Environment.MachineName
+                };
+                _context.Logs.Add(logEntry);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                var logEntry = new LogEntry
+                {
+                    LogDate = DateTime.UtcNow,
+                    LogLevel = level,
+                    Logger = logger,
+                    Message = message,
+                    Exception = "No Exception!",
+                    Thread = Thread.CurrentThread.ManagedThreadId.ToString(),
+                    UserName = Environment.UserName,
+                    MachineName = Environment.MachineName
+                };
+                _context.Logs.Add(logEntry);
+                await _context.SaveChangesAsync();
+            }
 
-            _context.Logs.Add(logEntry);
-            await _context.SaveChangesAsync();
         }
 
     }

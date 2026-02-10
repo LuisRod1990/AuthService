@@ -17,7 +17,7 @@ namespace AuthService.Infrastructure.Persistence
         public DbSet<TokenActivo> TokensActivos { get; set; }
 
         // Agrega el DbSet para LogEntry - Log4Net
-        public DbSet<LogEntry> Logs { get; set; }
+        public DbSet<LogEntry> Logs { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
