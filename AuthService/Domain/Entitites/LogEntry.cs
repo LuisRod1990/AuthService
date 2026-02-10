@@ -4,12 +4,12 @@
     {
         public int Id { get; set; }
         public DateTime LogDate { get; set; }
-        public string LogLevel { get; set; } = string.Empty;
-        public string Logger { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
-        public string Exception { get; set; } = string.Empty;
-        public string Thread { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
-        public string MachineName { get; set; }= string.Empty;
+        public required string LogLevel { get; set; }
+        public required string Logger { get; set; } 
+        public required string Message { get; set; }
+        public required string Exception { get; set; } 
+        public required string Thread { get; set; }
+        public required string UserName { get; set; }
+        public required string MachineName { get; set; }
     }
 }

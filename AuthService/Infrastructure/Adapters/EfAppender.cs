@@ -1,5 +1,7 @@
 ﻿using AuthService.Domain.Entitites;
 using AuthService.Infrastructure.Persistence;
+using log4net.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Infrastructure.Adapters
 {
@@ -20,7 +22,7 @@ namespace AuthService.Infrastructure.Adapters
             var logEntry = new LogEntry
             {
                 LogDate = loggingEvent.TimeStamp,
-                LogLevel = loggingEvent.Level.Name ?? string.Empty,
+                LogLevel = loggingEvent.Level.Name,
                 Logger = loggingEvent.LoggerName ?? string.Empty,
                 Message = loggingEvent.RenderedMessage ?? string.Empty,
                 Exception = loggingEvent.GetExceptionString() ?? string.Empty,
@@ -28,9 +30,10 @@ namespace AuthService.Infrastructure.Adapters
                 UserName = Environment.UserName,
                 MachineName = Environment.MachineName
             };
-
             context.Logs.Add(logEntry);
             context.SaveChanges();
+
+
         }
     }
 }
