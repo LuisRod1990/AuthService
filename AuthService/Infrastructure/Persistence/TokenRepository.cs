@@ -8,7 +8,24 @@ namespace AuthService.Infrastructure.Persistence
         private readonly AuthDbContext _context;
         public TokenRepository(AuthDbContext context) { _context = context; }
 
-        public void Save(TokenActivo token) { _context.TokensActivos.Add(token); _context.SaveChanges(); }
+        public void Save(TokenActivo token) 
+        {
+            // Revocar otros tokens activos del mismo usuario
+            var otrosTokens = _context.TokensActivos
+                .Where(t => t.UsuarioId == token.UsuarioId && t.Estado == "Activo")
+                .ToList();
+
+            foreach (var t in otrosTokens)
+            {
+                t.Estado = "Revocado";
+            }
+
+            // Insertar el nuevo token
+            _context.TokensActivos.Add(token);
+
+            // Guardar cambios
+            _context.SaveChanges();
+        }
         public TokenActivo? FindByRefreshToken(string refreshToken) => _context.TokensActivos.FirstOrDefault(t => t.RefreshToken == refreshToken && t.Estado == "Activo");
         public void RevokeToken(string accessToken)
         {
