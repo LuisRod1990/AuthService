@@ -69,7 +69,9 @@ namespace AuthService.Api
             try
             {
                 var oldToken = _tokenRepo.FindByRefreshToken(request.RefreshToken);
-                if (oldToken == null || oldToken.Estado.ToUpper() != "ACTIVO")
+                // LARJ: solo para el portafolio, para permitir una única sesión por usuario, se debe usar la anteiror
+                //if (oldToken == null || oldToken.Estado.ToUpper() != "ACTIVO")
+                if (oldToken == null)
                 {
                     log.Warn("Intento de refresh con token inválido o expirado");
                     return Unauthorized("Refresh token inválido o expirado");

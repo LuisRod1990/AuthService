@@ -10,10 +10,14 @@ namespace AuthService.Infrastructure.Persistence
 
         public void Save(TokenActivo token) 
         {
-            // Revocar otros tokens activos del mismo usuario
+            var fechaLimite = DateTime.UtcNow.Date.AddDays(-2);
+
             var otrosTokens = _context.TokensActivos
-                .Where(t => t.UsuarioId == token.UsuarioId && t.Estado == "Activo")
+                .Where(t => t.UsuarioId == token.UsuarioId
+                            && t.Estado == "Activo"
+                            && t.FechaCreacion.Date <= fechaLimite)
                 .ToList();
+
 
             foreach (var t in otrosTokens)
             {
@@ -28,8 +32,9 @@ namespace AuthService.Infrastructure.Persistence
         }
 
         // LARJ: public TokenActivo? FindByRefreshToken(string refreshToken) => _context.TokensActivos.FirstOrDefault(t => t.RefreshToken == refreshToken && t.Estado == "Activo"); -- Para varios usuarios
-        // LARJ: solo para el portafolio
-        public TokenActivo? FindByRefreshToken(string refreshToken) => _context.TokensActivos.FirstOrDefault(t => t.RefreshToken == refreshToken);
+        // LARJ: solo para el portafolio, para permitir una única sesión por usuario, se debe usar la anteiror
+        public TokenActivo? FindByRefreshToken(string refreshToken) 
+            => _context.TokensActivos.FirstOrDefault(t => t.RefreshToken == refreshToken);
         public void RevokeToken(string accessToken)
         {
             var token = _context.TokensActivos.FirstOrDefault(t => t.AccessToken == accessToken);
