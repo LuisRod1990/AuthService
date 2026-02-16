@@ -26,7 +26,10 @@ namespace AuthService.Infrastructure.Persistence
             // Guardar cambios
             _context.SaveChanges();
         }
-        public TokenActivo? FindByRefreshToken(string refreshToken) => _context.TokensActivos.FirstOrDefault(t => t.RefreshToken == refreshToken && t.Estado == "Activo");
+
+        // LARJ: public TokenActivo? FindByRefreshToken(string refreshToken) => _context.TokensActivos.FirstOrDefault(t => t.RefreshToken == refreshToken && t.Estado == "Activo"); -- Para varios usuarios
+        // LARJ: solo para el portafolio
+        public TokenActivo? FindByRefreshToken(string refreshToken) => _context.TokensActivos.FirstOrDefault(t => t.RefreshToken == refreshToken);
         public void RevokeToken(string accessToken)
         {
             var token = _context.TokensActivos.FirstOrDefault(t => t.AccessToken == accessToken);
