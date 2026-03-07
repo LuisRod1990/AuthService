@@ -27,7 +27,7 @@ jobs:
     # --- Verificar que el mmdb esté en la imagen ---
     - name: Check mmdb file in image
       run: |
-        docker run --rm authservice:latest ls -lh /app/App_Data/GeoLite2-City.mmdb
+        docker run --rm --entrypoint ls authservice:latest -lh /app/App_Data/GeoLite2-City.mmdb
 
     # --- Guardar imagen Docker en archivo tar ---
     - name: Save Docker image
@@ -58,7 +58,7 @@ jobs:
           docker load < /home/ec2-user/authservice.tar
 
           # Verificar que el archivo mmdb esté en la imagen
-          docker run --rm authservice:latest ls -lh /app/App_Data/GeoLite2-City.mmdb
+          docker run --rm --entrypoint ls authservice:latest -lh /app/App_Data/GeoLite2-City.mmdb
 
           docker stop authservice || true
           docker rm authservice || true
