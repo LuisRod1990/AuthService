@@ -15,6 +15,14 @@ jobs:
       with:
         lfs: true
 
+    - name: Install Git LFS
+      run: |
+        git lfs install
+        git lfs pull
+
+    - name: Verify mmdb file in runner
+      run: ls -lh AuthService/App_Data/GeoLite2-City.mmdb
+
     # --- Revisión de código ---
     - name: Code analysis
       run: dotnet build --configuration Release /warnaserror
