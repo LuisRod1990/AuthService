@@ -63,12 +63,15 @@ namespace AuthService.Api
             try
             {
                 // 1. IP del cliente
-                string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "N/A";
-                if (ipAddress == "::1" || ipAddress == "127.0.0.1")
+                string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? String.Empty;
+
+                // Si estás detrás de un proxy/Nginx/ALB, revisa también el header
+                var forwardedIp = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(forwardedIp))
                 {
-                    // Puedes poner cualquier IP pública para pruebas
-                    ipAddress = "189.203.45.12"; // Ejemplo: IP de México
+                    ipAddress = forwardedIp;
                 }
+
                 // 2. User-Agent (navegador)
                 string uaString = Request.Headers["User-Agent"].ToString();
                 var parser = Parser.GetDefault();

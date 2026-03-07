@@ -6,12 +6,14 @@ using AuthService.Infrastructure.Adapters;
 using AuthService.Infrastructure.Persistence;
 using AuthService.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -129,6 +131,12 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// Habilitar lectura de X-Forwarded-For y X-Forwarded-Proto
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("Cadena de conexión: {conn}", connectionString);
