@@ -27,7 +27,7 @@ COPY AuthService/log4net.config ./log4net.config
 
 # Crear carpeta App_Data y copiar la base de datos GeoLite2
 RUN mkdir -p /app/App_Data
-COPY App_Data/GeoLite2-City.mmdb /app/App_Data/GeoLite2-City.mmdb
+COPY AuthService/App_Data/GeoLite2-City.mmdb /app/App_Data/GeoLite2-City.mmdb
 
 # Crear carpeta Logs para asegurar que exista
 RUN mkdir -p /app/Logs
