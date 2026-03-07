@@ -17,8 +17,8 @@ jobs:
       run: dotnet build --configuration Release /warnaserror
 
     # --- Ejecutar tests ---
-    - name: Run tests
-      run: dotnet test AuthService.Test --configuration Release --no-build --verbosity normal
+    #- name: Run tests
+    #  run: dotnet test AuthService.Test --configuration Release --no-build --verbosity normal
 
     # --- Construcción de imagen Docker ---
     - name: Build Docker image

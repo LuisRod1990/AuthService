@@ -1,12 +1,14 @@
-﻿using Xunit;
-using Moq;
-using Microsoft.AspNetCore.Mvc;
-using AuthService.Api;
+﻿using AuthService.Api;
 using AuthService.Application.DTOs;
 using AuthService.Application.UseCases;
 using AuthService.Domain.Entities;
 using AuthService.Domain.Repositories;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using System.Net;
+using Xunit;
 
 public class AuthControllerTests
 {
@@ -21,6 +23,11 @@ public class AuthControllerTests
             new Mock<IUsuarioSeguridadRepository>().Object,
             new Mock<IWebHostEnvironment>().Object
         );
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
 
         var result = controller.Register() as OkObjectResult;
 
@@ -40,6 +47,11 @@ public class AuthControllerTests
             new Mock<IUsuarioSeguridadRepository>().Object,
             new Mock<IWebHostEnvironment>().Object
         );
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
 
         var request = new RegisterRequest { Username = "testuser", Password = "password" };
         var result = controller.Register(request) as OkObjectResult;
@@ -80,13 +92,12 @@ public class AuthControllerTests
         };
         var mockLoginUser = new Mock<ILoginUser>();
         mockLoginUser.Setup(l => l.Execute(
-            It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<string>(), It.IsAny<string>(),
-            It.IsAny<string>()))
-        .Returns(fakeToken);
-
+             It.IsAny<string>(), It.IsAny<string>(),
+             It.IsAny<string>(), It.IsAny<string>(),
+             It.IsAny<string>(), It.IsAny<string>(),
+             It.IsAny<string>(), It.IsAny<string>(),
+             It.IsAny<string>()))
+         .Returns(fakeToken);
 
         var controller = new AuthController(
             new Mock<IRegisterUser>().Object,
@@ -96,6 +107,11 @@ public class AuthControllerTests
             new Mock<IUsuarioSeguridadRepository>().Object, 
             new Mock<IWebHostEnvironment>().Object
         );
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
 
         var request = new LoginRequest { Username = "testuser", Password = "password" };
         var result = controller.Login(request) as OkObjectResult;
@@ -109,8 +125,14 @@ public class AuthControllerTests
     public void Login_ThrowsException_WhenCredentialsAreInvalid()
     {
         var mockLoginUser = new Mock<ILoginUser>();
-        mockLoginUser.Setup(l => l.Execute("baduser", "badpass", "Benito Juarez", "México", "Chrome Mobile", "19.3787", "-99.1622", "127.0.0.1", "Mexico City"))
-                     .Throws(new Exception("Credenciales inválidas"));
+        mockLoginUser.Setup(l => l.Execute(
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>()))
+        .Throws(new Exception("Credenciales inválidas"));
+
 
         var controller = new AuthController(
             new Mock<IRegisterUser>().Object,
@@ -120,6 +142,11 @@ public class AuthControllerTests
             new Mock<IUsuarioSeguridadRepository>().Object,
             new Mock<IWebHostEnvironment>().Object
         );
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
 
         var request = new LoginRequest { Username = "baduser", Password = "badpass" };
 
@@ -138,6 +165,11 @@ public class AuthControllerTests
             new Mock<IUsuarioSeguridadRepository>().Object,
             new Mock<IWebHostEnvironment>().Object
         );
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
 
         var request = new UpdatePasswordRequest { UsuarioId = 1, NewPassword = "newpass" };
         var result = controller.UpdatePassword(request) as OkObjectResult;
@@ -161,6 +193,11 @@ public class AuthControllerTests
             new Mock<IUsuarioSeguridadRepository>().Object,
             new Mock<IWebHostEnvironment>().Object
         );
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
 
         var result = controller.Refresh(new RefreshRequest { RefreshToken = "badtoken" }) as UnauthorizedObjectResult;
 
@@ -189,20 +226,13 @@ public class AuthControllerTests
                 FechaCreacion = DateTime.UtcNow,
                 UsuariosRoles = new List<UsuarioRol>(),
                 TokensActivos = new List<TokenActivo>()
-            }
-            ,
-            Explorer = "Chrome Mobile"
-            ,
-            City = "Benito Juarez"
-            ,
-            Region = "Mexico City"
-            ,
-            Country = "México"
-            ,
-            Latitud = "19.3787"
-            ,
-            Longitud = "-99.1622"
-            ,
+            },
+            Explorer = "Chrome Mobile",
+            City = "Benito Juarez",
+            Region = "Mexico City",
+            Country = "México",
+            Latitud = "19.3787",
+            Longitud = "-99.1622",
             PublicIp = "127.0.0.1"
         };
         var mockTokenRepo = new Mock<ITokenRepository>();
@@ -219,6 +249,11 @@ public class AuthControllerTests
             mockUsuarioRepo.Object,
             new Mock<IWebHostEnvironment>().Object
         );
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
 
         var result = controller.Refresh(new RefreshRequest { RefreshToken = "validtoken" }) as UnauthorizedObjectResult;
 
@@ -247,20 +282,13 @@ public class AuthControllerTests
                 FechaCreacion = DateTime.UtcNow,
                 UsuariosRoles = new List<UsuarioRol>(),
                 TokensActivos = new List<TokenActivo>()
-            }
-            ,
-            Explorer = "Chrome Mobile"
-            ,
-            City = "Benito Juarez"
-            ,
-            Region = "Mexico City"
-            ,
-            Country = "México"
-            ,
-            Latitud = "19.3787"
-            ,
-            Longitud = "-99.1622"
-            ,
+            }, 
+            Explorer = "Chrome Mobile",
+            City = "Benito Juarez",
+            Region = "Mexico City",
+            Country = "México",
+            Latitud = "19.3787",
+            Longitud = "-99.1622",
             PublicIp = "127.0.0.1"
         };
         var fakeUser = new UsuarioSeguridad
@@ -291,20 +319,13 @@ public class AuthControllerTests
                 FechaCreacion = DateTime.UtcNow,
                 UsuariosRoles = new List<UsuarioRol>(),
                 TokensActivos = new List<TokenActivo>()
-            }
-            ,
-            Explorer = "Chrome Mobile"
-            ,
-            City = "Benito Juarez"
-            ,
-            Region = "Mexico City"
-            ,
-            Country = "México"
-            ,
-            Latitud = "19.3787"
-            ,
-            Longitud = "-99.1622"
-            ,
+            },
+            Explorer = "Chrome Mobile",
+            City = "Benito Juarez",
+            Region = "Mexico City",
+            Country = "México",
+            Latitud = "19.3787",
+            Longitud = "-99.1622",
             PublicIp = "127.0.0.1"
         };
 
@@ -331,6 +352,11 @@ public class AuthControllerTests
             mockUsuarioRepo.Object,
             new Mock<IWebHostEnvironment>().Object
         );
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
 
         var result = controller.Refresh(new RefreshRequest { RefreshToken = "validtoken" }) as OkObjectResult;
 
