@@ -1,35 +1,76 @@
-# Etapa de build: compila tu proyecto
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+name: Deploy AuthService to EC2
 
-# Copiamos primero el archivo .csproj para aprovechar la cache de Docker
-COPY ["AuthService/AuthService.csproj", "AuthService/"]
-WORKDIR /src/AuthService
-RUN dotnet restore "AuthService.csproj"
+on:
+  push:
+    branches: [ "main" ]
 
-# Copiamos el resto del código
-WORKDIR /src
-COPY . .
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
-# Publicamos en modo Release
-WORKDIR /src/AuthService
-RUN dotnet publish -c Release -o /app
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-# Etapa de runtime: solo lo necesario para correr
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
-WORKDIR /app
+    # --- Revisión de código ---
+    - name: Code analysis
+      run: dotnet build --configuration Release /warnaserror
 
-# Copiamos la salida publicada
-COPY --from=build /app ./
+    # --- Construcción de imagen Docker ---
+    - name: Build Docker image
+      run: docker build -t authservice:latest .
 
-# Copiamos el archivo de configuración de log4net
-COPY AuthService/log4net.config ./log4net.config
+    # --- Verificar que el mmdb esté en la imagen ---
+    - name: Check mmdb file in image
+      run: |
+        docker run --rm --entrypoint ls authservice:latest -lh /app/App_Data/GeoLite2-City.mmdb
 
-# Crear carpeta App_Data y copiar la base de datos GeoLite2
-RUN mkdir -p /app/App_Data
-COPY AuthService/App_Data/GeoLite2-City.mmdb /app/App_Data/GeoLite2-City.mmdb
+    # --- Guardar imagen Docker en archivo tar ---
+    - name: Save Docker image
+      run: |
+        mkdir -p output
+        docker save -o output/authservice.tar authservice:latest
 
-# Crear carpeta Logs para asegurar que exista
-RUN mkdir -p /app/Logs
+    - name: Fix permissions
+      run: chmod 644 output/authservice.tar
 
-ENTRYPOINT ["dotnet", "AuthService.dll"]
+    # --- Copiar imagen a EC2 ---
+    - name: Copy image to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "output/authservice.tar"
+        target: "/home/ec2-user/"
+
+    # --- Cargar y correr contenedor en EC2 ---
+    - name: Load and run container on EC2
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          sudo systemctl enable docker
+          sudo systemctl start docker
+          sudo usermod -aG docker ec2-user
+
+          docker load < /home/ec2-user/authservice.tar
+
+          # Verificar que el archivo mmdb esté en la imagen
+          docker run --rm --entrypoint ls authservice:latest -lh /app/App_Data/GeoLite2-City.mmdb
+
+          docker stop authservice || true
+          docker rm authservice || true
+
+          docker run -d --restart always --name authservice -p 5000:5000 \
+            -v /home/ec2-user/logs:/app/Logs \
+            -e CONN="${{ secrets.CONN }}" \
+            -e CORS_HOST="${{ secrets.CORS_HOST }}" \
+            -e CORS_NAME="${{ secrets.CORS_NAME }}" \
+            -e JWT_AUDIENCE="${{ secrets.JWT_AUDIENCE }}" \
+            -e JWT_ISSUER="${{ secrets.JWT_ISSUER }}" \
+            -e JWT_KEY="${{ secrets.JWT_KEY }}" \
+            -e ASPNETCORE_URLS="http://+:5000" \
+            authservice:latest
