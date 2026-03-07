@@ -79,7 +79,14 @@ public class AuthControllerTests
             , PublicIp = "127.0.0.1"
         };
         var mockLoginUser = new Mock<ILoginUser>();
-        mockLoginUser.Setup(l => l.Execute("testuser", "password", "Benito Juarez", "México", "Chrome Mobile", "19.3787", "-99.1622", "127.0.0.1", "Mexico City")).Returns(fakeToken);
+        mockLoginUser.Setup(l => l.Execute(
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>()))
+        .Returns(fakeToken);
+
 
         var controller = new AuthController(
             new Mock<IRegisterUser>().Object,
@@ -308,7 +315,13 @@ public class AuthControllerTests
         mockUsuarioRepo.Setup(r => r.FindById(1)).Returns(fakeUser);
 
         var mockLoginUser = new Mock<ILoginUser>();
-        mockLoginUser.Setup(l => l.RefreshExecute(fakeUser, "Benito Juarez", "México", "Chrome Mobile", "19.3787", "-99.1622", "127.0.0.1", "Mexico City")).Returns(fakeNewToken);
+        mockLoginUser.Setup(l => l.RefreshExecute(
+            It.IsAny<UsuarioSeguridad>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>(), It.IsAny<string>(),
+            It.IsAny<string>()))
+        .Returns(fakeNewToken);
 
         var controller = new AuthController(
             new Mock<IRegisterUser>().Object,
