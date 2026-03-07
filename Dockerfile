@@ -29,4 +29,7 @@ COPY AuthService/log4net.config ./log4net.config
 RUN mkdir -p /app/App_Data
 COPY AuthService/App_Data/GeoLite2-City.mmdb /app/App_Data/GeoLite2-City.mmdb
 
+# Crear carpeta Logs para asegurar que exista
+RUN mkdir -p /app/Logs
+
 ENTRYPOINT ["dotnet", "AuthService.dll"]
