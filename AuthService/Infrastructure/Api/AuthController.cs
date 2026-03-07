@@ -58,32 +58,41 @@ namespace AuthService.Api
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            // 1. IP del cliente
-            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "N/A";
-            if (ipAddress == "::1" || ipAddress == "127.0.0.1")
+            try
             {
-                // Puedes poner cualquier IP pública para pruebas
-                ipAddress = "189.203.45.12"; // Ejemplo: IP de México
+                // 1. IP del cliente
+                string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "N/A";
+                if (ipAddress == "::1" || ipAddress == "127.0.0.1")
+                {
+                    // Puedes poner cualquier IP pública para pruebas
+                    ipAddress = "189.203.45.12"; // Ejemplo: IP de México
+                }
+                // 2. User-Agent (navegador)
+                string uaString = Request.Headers["User-Agent"].ToString();
+                var parser = Parser.GetDefault();
+                var clientInfo = parser.Parse(uaString);
+                string browser = clientInfo.UA.Family ?? "Unknown";
+                string browserVersion = clientInfo.UA.Major ?? "Unknown";
+                string os = clientInfo.OS.Family ?? "Unknown";
+                // 3. Ruta absoluta al archivo mmdb
+                string dbPath = Path.Combine(_env.ContentRootPath, "App_Data", "GeoLite2-City.mmdb");
+                using var reader = new DatabaseReader(dbPath);
+                var city = reader.City(ipAddress);
+                // Convertir todo a string para guardar en BD
+                string country = city.Country.Name ?? "Unknown";
+                string region = city.MostSpecificSubdivision.Name ?? "Unknown";
+                string cityName = city.City.Name ?? "Unknown";
+                string latitude = city.Location.Latitude.ToString() ?? "Unknown";
+                string longitude = city.Location.Longitude.ToString() ?? "Unknown";
+                var token = _loginUser.Execute(request.Username, request.Password, cityName, country, browser, latitude, longitude, ipAddress, region);
+                return Ok(token);
             }
-            // 2. User-Agent (navegador)
-            string uaString = Request.Headers["User-Agent"].ToString();
-            var parser = Parser.GetDefault();
-            var clientInfo = parser.Parse(uaString);
-            string browser = clientInfo.UA.Family ?? "Unknown";
-            string browserVersion = clientInfo.UA.Major ?? "Unknown";
-            string os = clientInfo.OS.Family ?? "Unknown";
-            // 3. Ruta absoluta al archivo mmdb
-            string dbPath = Path.Combine(_env.ContentRootPath, "App_Data", "GeoLite2-City.mmdb");
-            using var reader = new DatabaseReader(dbPath);
-            var city = reader.City(ipAddress);
-            // Convertir todo a string para guardar en BD
-            string country = city.Country.Name ?? "Unknown";
-            string region = city.MostSpecificSubdivision.Name ?? "Unknown";
-            string cityName = city.City.Name ?? "Unknown";
-            string latitude = city.Location.Latitude.ToString() ?? "Unknown";
-            string longitude = city.Location.Longitude.ToString() ?? "Unknown";
-            var token = _loginUser.Execute(request.Username, request.Password, cityName, country, browser, latitude, longitude, ipAddress, region);
-            return Ok(token);
+            catch (Exception ex)
+            {
+                // Aquí capturas cualquier error inesperado
+                _log.Error("Error en Login()", ex);
+                return StatusCode(500, "Ocurrió un error interno");
+            }
         }
 
 
