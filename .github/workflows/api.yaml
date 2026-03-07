@@ -12,38 +12,31 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    # --- Revisión de código ---
     - name: Code analysis
       run: dotnet build --configuration Release /warnaserror
 
-    # --- Ejecutar tests ---
-    #- name: Run tests
-    #  run: dotnet test AuthService.Test --configuration Release --no-build --verbosity normal
-
-    # --- Construcción de imagen Docker ---
     - name: Build Docker image
       run: docker build -t authservice:latest .
 
-    # --- Verificar que el mmdb esté en la imagen ---
     - name: Check mmdb file in image
       run: |
         docker run --rm --entrypoint ls authservice:latest -lh /app/App_Data/GeoLite2-City.mmdb
 
-    # --- Guardar imagen Docker en archivo tar ---
     - name: Save Docker image
-      run: docker save -o authservice.tar authservice:latest
+      run: |
+        mkdir -p output
+        docker save -o output/authservice.tar authservice:latest
+        chmod 644 output/authservice.tar
 
-    # --- Copiar imagen a EC2 ---
     - name: Copy image to EC2
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: "authservice.tar"
+        source: "output/authservice.tar"
         target: "/home/ec2-user/"
 
-    # --- Cargar y correr contenedor en EC2 ---
     - name: Load and run container on EC2
       uses: appleboy/ssh-action@v0.1.7
       with:
@@ -57,7 +50,6 @@ jobs:
 
           docker load < /home/ec2-user/authservice.tar
 
-          # Verificar que el archivo mmdb esté en la imagen
           docker run --rm --entrypoint ls authservice:latest -lh /app/App_Data/GeoLite2-City.mmdb
 
           docker stop authservice || true
