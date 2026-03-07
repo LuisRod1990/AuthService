@@ -16,7 +16,7 @@ namespace AuthService.Api
     public class AuthController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;
-        private static readonly ILog _log = LogManager.GetLogger(typeof(AuthController));
+        private readonly ILogger<AuthController> _logger;
         private readonly IRegisterUser _registerUser;
         private readonly ILoginUser _loginUser;
         private readonly ITokenRepository _tokenRepo;
@@ -29,9 +29,11 @@ namespace AuthService.Api
             IUpdateUserPassword updatePassword,
             ITokenRepository tokenRepo,
             IUsuarioSeguridadRepository usuarioRepo,
-            IWebHostEnvironment env
+            IWebHostEnvironment env,
+            ILogger<AuthController> logger
             )
         {
+            _logger = logger;
             _registerUser = registerUser;
             _loginUser = loginUser;
             _updatePassword = updatePassword;
@@ -90,7 +92,7 @@ namespace AuthService.Api
             catch (Exception ex)
             {
                 // Aquí capturas cualquier error inesperado
-                _log.Error("Error en Login()", ex);
+                _logger.LogError("Error en Login()", ex);
                 return StatusCode(500, "Ocurrió un error interno");
             }
         }
@@ -133,27 +135,27 @@ namespace AuthService.Api
                 //if (oldToken == null || oldToken.Estado.ToUpper() != "ACTIVO")
                 if (oldToken == null)
                 {
-                    _log.Warn("Intento de refresh con token inválido o expirado");
+                    _logger.LogError("Intento de refresh con token inválido o expirado");
                     return Unauthorized("Refresh token inválido o expirado");
                 }
 
                 var usuario = _usuarioRepo.FindById(oldToken.UsuarioId);
                 if (usuario == null || usuario.EstatusId == 0)
                 {
-                    _log.Warn($"Usuario no válido. Id: {oldToken.UsuarioId}");
+                    _logger.LogError($"Usuario no válido. Id: {oldToken.UsuarioId}");
                     return Unauthorized("Usuario no válido");
                 }
 
                 _tokenRepo.RevokeToken(oldToken.AccessToken);
                 var newToken = _loginUser.RefreshExecute(usuario, cityName, country, browser, latitude, longitude, ipAddress, region);
 
-                _log.Info($"Token refrescado correctamente para usuario {usuario.Usuario}");
+                _logger.LogInformation($"Token refrescado correctamente para usuario {usuario.Usuario}");
                 return Ok(newToken);
             }
             catch (Exception ex)
             {
                 // Aquí capturas cualquier error inesperado
-                _log.Error("Error en Refresh()", ex);
+                _logger.LogError("Error en Refresh()", ex);
                 return StatusCode(500, "Ocurrió un error interno");
             }
         }
