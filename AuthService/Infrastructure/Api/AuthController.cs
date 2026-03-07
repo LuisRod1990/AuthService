@@ -72,6 +72,13 @@ namespace AuthService.Api
                     ipAddress = forwardedIp;
                     _logger.LogInformation($"Login - Entra a IF ipAddress  {ipAddress}");
                 }
+                // Condición especial para localhost (::1 o 127.0.0.1)
+                if (ipAddress == "::1" || ipAddress == "127.0.0.1" || ipAddress == "localhost")
+                {
+                    // IP pública de México por defecto (ejemplo: CDMX)
+                    ipAddress = "187.191.36.90";
+                    _logger.LogInformation("Login - IP ajustada a México por defecto");
+                }
 
                 // 2. User-Agent (navegador)
                 string uaString = Request.Headers["User-Agent"].ToString();
@@ -125,6 +132,13 @@ namespace AuthService.Api
                     ipAddress = forwardedIp;
                     _logger.LogInformation($"Login - Entra a IF ipAddress  {ipAddress}");
                 }
+                // Condición especial para localhost (::1 o 127.0.0.1)
+                if (ipAddress == "::1" || ipAddress == "127.0.0.1" || ipAddress == "localhost")
+                {
+                    // IP pública de México por defecto (ejemplo: CDMX)
+                    ipAddress = "187.191.36.90";
+                    _logger.LogInformation("Login - IP ajustada a México por defecto");
+                }
                 // 2. User-Agent (navegador)
                 string uaString = Request.Headers["User-Agent"].ToString();
                 var parser = Parser.GetDefault();
@@ -148,6 +162,7 @@ namespace AuthService.Api
                 if (oldToken == null)
                 {
                     _logger.LogError("Intento de refresh con token inválido o expirado");
+
                     return Unauthorized("Refresh token inválido o expirado");
                 }
 
