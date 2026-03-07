@@ -6,6 +6,7 @@ using AuthService.Application.DTOs;
 using AuthService.Application.UseCases;
 using AuthService.Domain.Entities;
 using AuthService.Domain.Repositories;
+using Microsoft.AspNetCore.Hosting;
 
 public class AuthControllerTests
 {
@@ -17,7 +18,8 @@ public class AuthControllerTests
             new Mock<ILoginUser>().Object,
             new Mock<IUpdateUserPassword>().Object,
             new Mock<ITokenRepository>().Object,
-            new Mock<IUsuarioSeguridadRepository>().Object
+            new Mock<IUsuarioSeguridadRepository>().Object,
+            new Mock<IWebHostEnvironment>().Object
         );
 
         var result = controller.Register() as OkObjectResult;
@@ -35,7 +37,8 @@ public class AuthControllerTests
             new Mock<ILoginUser>().Object,
             new Mock<IUpdateUserPassword>().Object,
             new Mock<ITokenRepository>().Object,
-            new Mock<IUsuarioSeguridadRepository>().Object
+            new Mock<IUsuarioSeguridadRepository>().Object,
+            new Mock<IWebHostEnvironment>().Object
         );
 
         var request = new RegisterRequest { Username = "testuser", Password = "password" };
@@ -67,16 +70,24 @@ public class AuthControllerTests
                 UsuariosRoles = new List<UsuarioRol>(),
                 TokensActivos = new List<TokenActivo>()
             }
+            , Explorer = "Chrome Mobile"
+            , City = "Benito Juarez"
+            , Region = "Mexico City"
+            , Country = "México"
+            , Latitud = "19.3787"
+            , Longitud = "-99.1622"
+            , PublicIp = "127.0.0.1"
         };
         var mockLoginUser = new Mock<ILoginUser>();
-        mockLoginUser.Setup(l => l.Execute("testuser", "password")).Returns(fakeToken);
+        mockLoginUser.Setup(l => l.Execute("testuser", "password", "Benito Juarez", "México", "Chrome Mobile", "19.3787", "-99.1622", "127.0.0.1", "Mexico City")).Returns(fakeToken);
 
         var controller = new AuthController(
             new Mock<IRegisterUser>().Object,
             mockLoginUser.Object,
             new Mock<IUpdateUserPassword>().Object,
             new Mock<ITokenRepository>().Object,
-            new Mock<IUsuarioSeguridadRepository>().Object
+            new Mock<IUsuarioSeguridadRepository>().Object, 
+            new Mock<IWebHostEnvironment>().Object
         );
 
         var request = new LoginRequest { Username = "testuser", Password = "password" };
@@ -91,7 +102,7 @@ public class AuthControllerTests
     public void Login_ThrowsException_WhenCredentialsAreInvalid()
     {
         var mockLoginUser = new Mock<ILoginUser>();
-        mockLoginUser.Setup(l => l.Execute("baduser", "badpass"))
+        mockLoginUser.Setup(l => l.Execute("baduser", "badpass", "Benito Juarez", "México", "Chrome Mobile", "19.3787", "-99.1622", "127.0.0.1", "Mexico City"))
                      .Throws(new Exception("Credenciales inválidas"));
 
         var controller = new AuthController(
@@ -99,7 +110,8 @@ public class AuthControllerTests
             mockLoginUser.Object,
             new Mock<IUpdateUserPassword>().Object,
             new Mock<ITokenRepository>().Object,
-            new Mock<IUsuarioSeguridadRepository>().Object
+            new Mock<IUsuarioSeguridadRepository>().Object,
+            new Mock<IWebHostEnvironment>().Object
         );
 
         var request = new LoginRequest { Username = "baduser", Password = "badpass" };
@@ -116,7 +128,8 @@ public class AuthControllerTests
             new Mock<ILoginUser>().Object,
             mockUpdatePassword.Object,
             new Mock<ITokenRepository>().Object,
-            new Mock<IUsuarioSeguridadRepository>().Object
+            new Mock<IUsuarioSeguridadRepository>().Object,
+            new Mock<IWebHostEnvironment>().Object
         );
 
         var request = new UpdatePasswordRequest { UsuarioId = 1, NewPassword = "newpass" };
@@ -138,7 +151,8 @@ public class AuthControllerTests
             new Mock<ILoginUser>().Object,
             new Mock<IUpdateUserPassword>().Object,
             mockTokenRepo.Object,
-            new Mock<IUsuarioSeguridadRepository>().Object
+            new Mock<IUsuarioSeguridadRepository>().Object,
+            new Mock<IWebHostEnvironment>().Object
         );
 
         var result = controller.Refresh(new RefreshRequest { RefreshToken = "badtoken" }) as UnauthorizedObjectResult;
@@ -169,6 +183,20 @@ public class AuthControllerTests
                 UsuariosRoles = new List<UsuarioRol>(),
                 TokensActivos = new List<TokenActivo>()
             }
+            ,
+            Explorer = "Chrome Mobile"
+            ,
+            City = "Benito Juarez"
+            ,
+            Region = "Mexico City"
+            ,
+            Country = "México"
+            ,
+            Latitud = "19.3787"
+            ,
+            Longitud = "-99.1622"
+            ,
+            PublicIp = "127.0.0.1"
         };
         var mockTokenRepo = new Mock<ITokenRepository>();
         mockTokenRepo.Setup(r => r.FindByRefreshToken("validtoken")).Returns(fakeToken);
@@ -181,7 +209,8 @@ public class AuthControllerTests
             new Mock<ILoginUser>().Object,
             new Mock<IUpdateUserPassword>().Object,
             mockTokenRepo.Object,
-            mockUsuarioRepo.Object
+            mockUsuarioRepo.Object,
+            new Mock<IWebHostEnvironment>().Object
         );
 
         var result = controller.Refresh(new RefreshRequest { RefreshToken = "validtoken" }) as UnauthorizedObjectResult;
@@ -212,6 +241,20 @@ public class AuthControllerTests
                 UsuariosRoles = new List<UsuarioRol>(),
                 TokensActivos = new List<TokenActivo>()
             }
+            ,
+            Explorer = "Chrome Mobile"
+            ,
+            City = "Benito Juarez"
+            ,
+            Region = "Mexico City"
+            ,
+            Country = "México"
+            ,
+            Latitud = "19.3787"
+            ,
+            Longitud = "-99.1622"
+            ,
+            PublicIp = "127.0.0.1"
         };
         var fakeUser = new UsuarioSeguridad
         {
@@ -242,6 +285,20 @@ public class AuthControllerTests
                 UsuariosRoles = new List<UsuarioRol>(),
                 TokensActivos = new List<TokenActivo>()
             }
+            ,
+            Explorer = "Chrome Mobile"
+            ,
+            City = "Benito Juarez"
+            ,
+            Region = "Mexico City"
+            ,
+            Country = "México"
+            ,
+            Latitud = "19.3787"
+            ,
+            Longitud = "-99.1622"
+            ,
+            PublicIp = "127.0.0.1"
         };
 
         var mockTokenRepo = new Mock<ITokenRepository>();
@@ -251,14 +308,15 @@ public class AuthControllerTests
         mockUsuarioRepo.Setup(r => r.FindById(1)).Returns(fakeUser);
 
         var mockLoginUser = new Mock<ILoginUser>();
-        mockLoginUser.Setup(l => l.RefreshExecute(fakeUser)).Returns(fakeNewToken);
+        mockLoginUser.Setup(l => l.RefreshExecute(fakeUser, "Benito Juarez", "México", "Chrome Mobile", "19.3787", "-99.1622", "127.0.0.1", "Mexico City")).Returns(fakeNewToken);
 
         var controller = new AuthController(
             new Mock<IRegisterUser>().Object,
             mockLoginUser.Object,
             new Mock<IUpdateUserPassword>().Object,
             mockTokenRepo.Object,
-            mockUsuarioRepo.Object
+            mockUsuarioRepo.Object,
+            new Mock<IWebHostEnvironment>().Object
         );
 
         var result = controller.Refresh(new RefreshRequest { RefreshToken = "validtoken" }) as OkObjectResult;
