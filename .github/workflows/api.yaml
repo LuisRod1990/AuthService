@@ -39,9 +39,8 @@ jobs:
     # --- Guardar imagen Docker en archivo tar ---
     - name: Save Docker image
       run: |
-        mkdir -p output
-        docker save -o output/authservice.tar authservice:latest
-        chmod 644 output/authservice.tar
+        docker save -o authservice.tar authservice:latest
+        chmod 644 authservice.tar
 
     # --- Copiar imagen a EC2 ---
     - name: Copy image to EC2
@@ -50,7 +49,7 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: "output/authservice.tar"
+        source: "authservice.tar"
         target: "/home/ec2-user/"
 
     # --- Cargar y correr contenedor en EC2 ---
@@ -65,7 +64,7 @@ jobs:
           sudo systemctl start docker
           sudo usermod -aG docker ec2-user
 
-          docker load < /home/ec2-user/authservice.tar
+          sudo docker load -i /home/ec2-user/authservice.tar
 
           # Verificar que el archivo mmdb esté en la imagen
           docker run --rm --entrypoint ls authservice:latest -lh /app/App_Data/GeoLite2-City.mmdb
