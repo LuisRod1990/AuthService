@@ -25,4 +25,8 @@ COPY --from=build /app ./
 # Copiamos el archivo de configuración de log4net
 COPY AuthService/log4net.config ./log4net.config
 
+# Crear carpeta App_Data y copiar la base de datos GeoLite2
+RUN mkdir -p /app/App_Data
+COPY AuthService/App_Data/GeoLite2-City.mmdb /app/App_Data/GeoLite2-City.mmdb
+
 ENTRYPOINT ["dotnet", "AuthService.dll"]
