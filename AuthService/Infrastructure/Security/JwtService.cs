@@ -15,7 +15,7 @@ namespace AuthService.Infrastructure.Security
         {
             _dateTimeProvider = dateTimeProvider;
         }
-        public TokenActivo GenerateTokens(UsuarioSeguridad usuario)
+        public TokenActivo GenerateTokens(UsuarioSeguridad usuario, string city, string country, string explorer, string latitud, string longitud, string publicip, string region)
         {
             var jwt_key = Environment.GetEnvironmentVariable("JWT_KEY");
             var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
@@ -54,7 +54,14 @@ namespace AuthService.Infrastructure.Security
                 FechaCreacion = DateTime.UtcNow,
                 FechaExpiracion = DateTime.UtcNow.AddDays(30),
                 Estado = "Activo",
-                Usuario = usuario
+                Usuario = usuario,
+                Explorer = explorer,
+                PublicIp = publicip,
+                Country = country,
+                Region = region,
+                City = city,
+                Latitud = latitud,
+                Longitud = longitud,
             };
         }
     }

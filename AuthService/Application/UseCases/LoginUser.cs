@@ -12,18 +12,18 @@ namespace AuthService.Application.UseCases
         private readonly ITokenRepository _tokenRepo;
         public LoginUser(IUsuarioSeguridadRepository repo, PasswordHasherService hasher, ITokenService tokenService, ITokenRepository tokenRepo)
         { _repo = repo; _hasher = hasher; _tokenService = tokenService; _tokenRepo = tokenRepo; }
-        public TokenActivo Execute(string username, string password)
+        public TokenActivo Execute(string username, string password, string city, string country, string explorer, string latitud, string longitud, string publicip, string region)
         {
             var user = _repo.FindByUsername(username);
             if (user == null || !_hasher.Verify(password, user.PasswordHash))
                 throw new Exception("Credenciales inválidas");
-            var token = _tokenService.GenerateTokens(user);
+            var token = _tokenService.GenerateTokens(user, city, country, explorer, latitud, longitud, publicip, region);
             _tokenRepo.Save(token);
             return token;
         }
-        public TokenActivo RefreshExecute(UsuarioSeguridad user)
+        public TokenActivo RefreshExecute(UsuarioSeguridad user, string city, string country, string explorer, string latitud, string longitud, string publicip, string region)
         {
-            var token = _tokenService.GenerateTokens(user);
+            var token = _tokenService.GenerateTokens(user, city, country, explorer, latitud, longitud, publicip, region);
             _tokenRepo.Save(token);
             return token;
         }

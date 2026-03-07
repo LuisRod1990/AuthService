@@ -5,6 +5,6 @@ namespace AuthService.Domain.Services
 {
     public interface ITokenService
     {
-        TokenActivo GenerateTokens(UsuarioSeguridad usuario);
+        TokenActivo GenerateTokens(UsuarioSeguridad usuario, string city, string country, string explorer, string latitud, string longitud, string publicip, string region);
     }
 }
