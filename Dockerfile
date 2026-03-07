@@ -18,5 +18,11 @@ RUN dotnet publish -c Release -o /app
 # Etapa de runtime: solo lo necesario para correr
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
+
+# Copiamos la salida publicada
 COPY --from=build /app ./
+
+# Copiamos el archivo de configuración de log4net
+COPY AuthService/log4net.config ./log4net.config
+
 ENTRYPOINT ["dotnet", "AuthService.dll"]
