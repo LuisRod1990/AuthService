@@ -92,7 +92,7 @@ namespace AuthService.Api
             catch (Exception ex)
             {
                 // Aquí capturas cualquier error inesperado
-                _logger.LogError("Error en Login()", ex);
+                _logger.LogError(ex, "Error en Login()");
                 return StatusCode(500, "Ocurrió un error interno");
             }
         }
@@ -155,7 +155,7 @@ namespace AuthService.Api
             catch (Exception ex)
             {
                 // Aquí capturas cualquier error inesperado
-                _logger.LogError("Error en Refresh()", ex);
+                _logger.LogError(ex, "Error en Refresh()");
                 return StatusCode(500, "Ocurrió un error interno");
             }
         }
