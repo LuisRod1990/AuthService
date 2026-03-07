@@ -64,12 +64,13 @@ namespace AuthService.Api
             {
                 // 1. IP del cliente
                 string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? String.Empty;
-
+                _logger.LogInformation($"Login - ipAddress  {ipAddress}");
                 // Si estás detrás de un proxy/Nginx/ALB, revisa también el header
                 var forwardedIp = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
                 if (!string.IsNullOrEmpty(forwardedIp))
                 {
                     ipAddress = forwardedIp;
+                    _logger.LogInformation($"Login - Entra a IF ipAddress  {ipAddress}");
                 }
 
                 // 2. User-Agent (navegador)
@@ -115,7 +116,15 @@ namespace AuthService.Api
             try
             {
                 // 1. IP del cliente
-                string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "N/A";
+                string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? String.Empty;
+                _logger.LogInformation($"Login - ipAddress  {ipAddress}");
+                // Si estás detrás de un proxy/Nginx/ALB, revisa también el header
+                var forwardedIp = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(forwardedIp))
+                {
+                    ipAddress = forwardedIp;
+                    _logger.LogInformation($"Login - Entra a IF ipAddress  {ipAddress}");
+                }
                 // 2. User-Agent (navegador)
                 string uaString = Request.Headers["User-Agent"].ToString();
                 var parser = Parser.GetDefault();
